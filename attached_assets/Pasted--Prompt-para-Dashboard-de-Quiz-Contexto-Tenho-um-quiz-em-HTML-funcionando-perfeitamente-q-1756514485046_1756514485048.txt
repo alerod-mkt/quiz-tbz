@@ -1,0 +1,83 @@
+# Prompt para Dashboard de Quiz
+
+**Contexto:** 
+Tenho um quiz em HTML funcionando perfeitamente que coleta leads através de perguntas sequenciais. Preciso agora de um dashboard administrativo para acompanhar o desempenho e comportamento dos usuários.
+
+**Solicitação:**
+Crie um dashboard administrativo completo para monitorar meu quiz com as seguintes características:
+
+## 📊 Métricas Principais
+- **Taxa de conversão geral** (quantos completam vs. quantos iniciam)
+- **Funil de abandono** (em qual etapa os leads mais desistem)
+- **Número total de leads gerados** (hoje, semana, mês)
+- **Taxa de abandono por etapa** (percentual que sai em cada pergunta)
+- **Tempo médio de conclusão** do quiz
+
+## 📈 Gráficos e Visualizações
+- **Gráfico de funil** mostrando a progressão entre etapas
+- **Gráfico de barras** com abandono por pergunta
+- **Gráfico de linha temporal** (leads por dia/semana)
+- **Heatmap** dos horários com mais atividade
+- **Pizza/donut** com distribuição das respostas mais comuns
+
+## 📋 Tabelas e Listagens
+- **Lista de sessões** com filtros por:
+  - Data de acesso
+  - Status (completo/incompleto) 
+  - Etapa de abandono
+  - Tempo de sessão
+- **Métricas agregadas** sem identificação pessoal
+
+## 🎨 Interface
+- **Design limpo e profissional** (estilo moderno)
+- **Responsivo** (funciona bem no mobile)
+- **Cores contrastantes** para fácil leitura
+- **Cards organizados** para cada métrica
+- **Navegação intuitiva** entre seções
+
+## 🔧 Funcionalidades Técnicas
+- **Atualização em tempo real** ou botão para refresh
+- **Exportação de métricas** (CSV/JSON)
+- **Filtros por período** (último dia, semana, mês)
+- **Busca por datas/períodos específicos**
+- **Sistema de login simples** para acesso restrito
+
+## 💾 Armazenamento de Dados (JSON Files)
+- **IMPORTANTE**: Usar apenas arquivos JSON para armazenar:
+  - Contador de visitantes por etapa
+  - Taxas de conversão entre etapas
+  - Horários de maior atividade
+  - Tempo médio gasto por etapa
+  - Pontos de abandono (sem dados pessoais)
+  - Métricas agregadas por data
+
+**Tecnologias sugeridas:**
+- HTML5 + CSS3 + JavaScript vanilla
+- **JSON files** para armazenamento (fácil migração para servidor próprio)
+- Charts.js ou similar para gráficos
+- **Zero banco de dados** - só arquivos JSON simples
+
+**Estrutura JSON sugerida:**
+- `funil_stats.json` → contadores e taxas por etapa
+- `metricas_diarias.json` → dados agregados por data
+- `sessoes.json` → log de sessões anônimas (sem dados pessoais)
+- `config.json` → configurações do dashboard
+
+**Prioridades:**
+1. Funil de conversão (mais importante)
+2. Métricas de abandono por etapa
+3. Interface responsiva e limpa
+4. Portabilidade total para servidor próprio
+5. Exportação de métricas
+
+Preciso que seja **100% portável**, **sem dados pessoais** e **funcional imediatamente** após migração.
+
+## 🎯 Requisitos Importantes
+- **FACILMENTE PORTÁVEL**: O projeto deve funcionar perfeitamente após download e upload em servidor próprio
+- **SEM DADOS PESSOAIS**: Armazenar apenas métricas de fluxo e comportamento agregado
+- **ARQUIVOS JSON APENAS**: Zero configuração de banco de dados
+- **PLUG & PLAY**: Funcionar imediatamente após migração do Replit para servidor próprio
+
+---
+
+*Observação: Se precisar de banco de dados mais complexo, estou aberto a sugestões de como integrar com o quiz existente.*

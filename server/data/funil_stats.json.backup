@@ -1,0 +1,138 @@
+{
+  "etapas": {
+    "landing": {
+      "nome": "landing",
+      "visitantes": 7,
+      "conversoes": 2,
+      "taxa_conversao": 66.66666666666666,
+      "tempo_medio_segundos": 0
+    },
+    "quiz_inicio": {
+      "nome": "quiz_inicio",
+      "visitantes": 2,
+      "conversoes": 2,
+      "taxa_conversao": 100,
+      "tempo_medio_segundos": 0
+    },
+    "quiz_pergunta_2": {
+      "nome": "quiz_pergunta_2",
+      "visitantes": 2,
+      "conversoes": 2,
+      "taxa_conversao": 100,
+      "tempo_medio_segundos": 0
+    },
+    "quiz_pergunta_3": {
+      "nome": "quiz_pergunta_3",
+      "visitantes": 2,
+      "conversoes": 2,
+      "taxa_conversao": 100,
+      "tempo_medio_segundos": 0
+    },
+    "quiz_pergunta_4": {
+      "nome": "quiz_pergunta_4",
+      "visitantes": 2,
+      "conversoes": 2,
+      "taxa_conversao": 100,
+      "tempo_medio_segundos": 0
+    },
+    "quiz_pergunta_5": {
+      "nome": "quiz_pergunta_5",
+      "visitantes": 2,
+      "conversoes": 2,
+      "taxa_conversao": 100,
+      "tempo_medio_segundos": 0
+    },
+    "quiz_pergunta_6": {
+      "nome": "quiz_pergunta_6",
+      "visitantes": 2,
+      "conversoes": 2,
+      "taxa_conversao": 100,
+      "tempo_medio_segundos": 0
+    },
+    "quiz_pergunta_7": {
+      "nome": "quiz_pergunta_7",
+      "visitantes": 2,
+      "conversoes": 2,
+      "taxa_conversao": 100,
+      "tempo_medio_segundos": 0
+    },
+    "quiz_pergunta_8": {
+      "nome": "quiz_pergunta_8",
+      "visitantes": 2,
+      "conversoes": 2,
+      "taxa_conversao": 100,
+      "tempo_medio_segundos": 0
+    },
+    "quiz_pergunta_9": {
+      "nome": "quiz_pergunta_9",
+      "visitantes": 2,
+      "conversoes": 2,
+      "taxa_conversao": 100,
+      "tempo_medio_segundos": 0
+    },
+    "quiz_pergunta_10": {
+      "nome": "quiz_pergunta_10",
+      "visitantes": 2,
+      "conversoes": 2,
+      "taxa_conversao": 100,
+      "tempo_medio_segundos": 0
+    },
+    "quiz_pergunta_11": {
+      "nome": "quiz_pergunta_11",
+      "visitantes": 2,
+      "conversoes": 2,
+      "taxa_conversao": 100,
+      "tempo_medio_segundos": 0
+    },
+    "quiz_pergunta_12": {
+      "nome": "quiz_pergunta_12",
+      "visitantes": 2,
+      "conversoes": 2,
+      "taxa_conversao": 100,
+      "tempo_medio_segundos": 0
+    },
+    "quiz_pergunta_13": {
+      "nome": "quiz_pergunta_13",
+      "visitantes": 2,
+      "conversoes": 2,
+      "taxa_conversao": 100,
+      "tempo_medio_segundos": 0
+    },
+    "quiz_pergunta_14": {
+      "nome": "quiz_pergunta_14",
+      "visitantes": 2,
+      "conversoes": 2,
+      "taxa_conversao": 100,
+      "tempo_medio_segundos": 0
+    },
+    "quiz_pergunta_15": {
+      "nome": "quiz_pergunta_15",
+      "visitantes": 2,
+      "conversoes": 2,
+      "taxa_conversao": 100,
+      "tempo_medio_segundos": 0
+    },
+    "vsl": {
+      "nome": "vsl",
+      "visitantes": 2,
+      "conversoes": 1,
+      "taxa_conversao": 50,
+      "tempo_medio_segundos": 0
+    },
+    "sales": {
+      "nome": "sales",
+      "visitantes": 1,
+      "conversoes": 1,
+      "taxa_conversao": 100,
+      "tempo_medio_segundos": 0
+    },
+    "checkout_iniciado": {
+      "nome": "checkout_iniciado",
+      "visitantes": 1,
+      "conversoes": 0,
+      "taxa_conversao": 0,
+      "tempo_medio_segundos": 0
+    }
+  },
+  "ultima_atualizacao": "2025-09-01T01:15:09.476Z"
+}

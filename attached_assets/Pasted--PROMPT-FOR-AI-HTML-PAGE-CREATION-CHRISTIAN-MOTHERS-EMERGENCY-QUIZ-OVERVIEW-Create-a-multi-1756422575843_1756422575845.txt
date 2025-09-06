@@ -1,0 +1,214 @@
+# PROMPT FOR AI HTML PAGE CREATION - CHRISTIAN MOTHERS EMERGENCY QUIZ
+
+## OVERVIEW
+Create a multi-page HTML quiz system for Christian mothers about saving their children from relationship trauma caused by marital fights. This is an emergency diagnostic quiz with high emotional impact. The quiz should have a professional, urgent design with smooth transitions between pages. All text must be in Portuguese (Brazil).
+
+## TECHNICAL REQUIREMENTS
+- Responsive design (mobile-first)
+- Clean, professional CSS styling with urgent/emergency feel
+- Smooth page transitions
+- Progress indicator
+- Form validation
+- Modern, trustworthy appearance
+- Color palette: Deep blues, whites, urgent reds for CTAs
+- Easy-to-read fonts
+- Mobile optimization essential
+
+## COMPLETE QUIZ STRUCTURE & FLOW
+
+### PAGE 1: EMERGENCY LANDING PAGE
+**Headline:** "PARE! SUAS BRIGAS ESTÃO CONDENANDO SEUS FILHOS"
+**Subtitle:** "Faça Este Diagnóstico Antes Que o Dano Se Torne Irreversível"
+
+**Support Text:**
+"A cada briga que seus filhos presenciam, você os ensina que casamento é sofrimento. Neurociência confirma: isso causa danos permanentes após os 12 anos. Este diagnóstico revelará o nível de risco e gerará seu plano de resgate:"
+
+**Bullet Points:**
+- ✅ O protocolo de emergência para parar as brigas antes que seja tarde demais
+- ✅ Como desprogramar seus filhos dos traumas já causados pelas discussões  
+- ✅ As 3 frases que fazem qualquer marido parar na hora e te respeitar
+- ✅ O método para ser ouvida sem destruir a paz da família
+- ✅ Como transformar sua casa de campo de batalha em lar de paz
+
+**Social Proof:** "1.436 mães já salvaram seus casamentos e protegeram o futuro dos filhos"
+**Button:** "QUERO SALVAR MEUS FILHOS AGORA"
+
+### PAGE 2: QUESTION 1 (SITUATION)
+**Question:** "Seus filhos presenciam suas brigas?"
+**Options:**
+- A) Sim, e isso me mata por dentro todos os dias
+- B) Às vezes, mas tento esconder (sei que eles percebem tudo)  
+- C) Não tenho filhos, mas pretendo ter
+
+### PAGE 3: QUESTION 2 (SITUATION)
+**Question:** "Qual a idade dos seus filhos?"
+**Options:**
+- A) Pequenos (0-6 anos) - ainda posso protegê-los
+- B) Pré-adolescentes (7-12 anos) - estou na última chance
+- C) Adolescentes (13+ anos) - pode ser tarde demais
+
+### PAGE 4: QUESTION 3 (PROBLEM)
+**Question:** "Com que frequência vocês explodem em discussões?"
+**Options:**
+- A) Várias vezes por semana - virou um inferno
+- B) Pelo menos uma vez por semana - intensamente
+- C) Algumas vezes por mês, mas são brigas destruidoras
+
+### PAGE 5: QUESTION 4 (PROBLEM)
+**Question:** "Seus filhos já imploraram para vocês pararem?"
+**Options:**
+- A) Sim, e isso despedaçou meu coração completamente
+- B) Eles choram ou ficam apavorados quando brigamos
+- C) Vejo o medo nos olhos deles quando começamos
+
+### PAGE 6: QUESTION 5 (PROBLEM)
+**Question:** "Como você se sente sabendo que está prejudicando seus filhos?"
+**Options:**
+- A) Destruída - sou a pior mãe do mundo
+- B) Desesperada - não consigo parar mesmo sabendo do mal
+- C) Culpada - sei que estou falhando com eles
+
+### PAGE 7: QUESTION 6 (PROBLEM)
+**Question:** "O que mais te desespera nessas brigas?"
+**Options:**
+- A) Ver o terror nos olhos dos meus filhos
+- B) Saber que estou ensinando eles que amor dói
+- C) Perceber que eles estão perdendo a inocência
+
+### PAGE 8: QUESTION 7 (PROBLEM)
+**Question:** "Como seu marido reage durante as discussões?"
+**Options:**
+- A) Grita de volta na frente das crianças
+- B) Sai batendo a porta, deixando todos abalados
+- C) Fica em silêncio, mas o clima fica pesado por dias
+
+### PAGE 9: QUESTION 8 (PROBLEM)
+**Question:** "Você percebe seus filhos mudando por causa das brigas?"
+**Options:**
+- A) Sim, eles estão mais agressivos e nervosos
+- B) Ficaram mais quietos e retraídos
+- C) Começaram a ter pesadelos ou problemas na escola
+
+### PAGE 10: QUESTION 9 (IMPLICATION)
+**Question:** "Você tem medo de estar traumatizando seus filhos para sempre?"
+**Options:**
+- A) Sim, tenho pavor de estar destruindo eles
+- B) Morro de medo de que eles me odeiem no futuro
+- C) Tenho certeza de que já causei danos irreparáveis
+
+### PAGE 11: QUESTION 10 (IMPLICATION)
+**Question:** "Como você se sente quando vê outros casais harmoniosos com filhos?"
+**Options:**
+- A) Morto de inveja - queria que fossem meus filhos
+- B) Devastada - sei que meus filhos merecem isso
+- C) Envergonhada - sou um exemplo terrível de mãe
+
+### PAGE 12: QUESTION 11 (IMPLICATION)
+**Question:** "Qual seu maior medo sobre o futuro dos seus filhos?"
+**Options:**
+- A) Que tenham relacionamentos tóxicos por minha culpa
+- B) Que nunca consigam ser felizes no amor
+- C) Que me culpem para sempre por ter arruinado eles
+
+### PAGE 13: QUESTION 12 (IMPLICATION)
+**Question:** "Você já teve pesadelos com seus filhos adultos te confrontando?"
+**Options:**
+- A) Sim, acordo suando pensando nisso
+- B) Tenho pavor do dia em que eles me perguntarem "por quê?"
+- C) Sei que um dia vão me odiar pelo que fiz
+
+### PAGE 14: QUESTION 13 (NEED)
+**Question:** "Você faria QUALQUER COISA para proteger seus filhos agora?"
+**Options:**
+- A) SIM! Qualquer sacrifício pelos meus filhos
+- B) Com certeza, eles são minha prioridade absoluta
+- C) Sem dúvida, não posso falhar mais com eles
+
+### PAGE 15: QUESTION 14 (NEED)
+**Question:** "Se pudesse voltar no tempo e mudar tudo em 7 dias, mudaria?"
+**Options:**
+- A) Imediatamente, daria qualquer coisa por essa chance
+- B) Sem hesitar, não aguento mais ver eles sofrendo
+- C) É meu último desejo na vida - salvar meus filhos
+
+### PAGE 16: QUESTION 15 (NEED)
+**Question:** "Quanto vale o futuro e felicidade dos seus filhos?"
+**Options:**
+- A) Não tem preço - são meus tesouros mais preciosos
+- B) Vale minha própria vida - faria qualquer coisa por eles
+- C) É mais importante que qualquer outra coisa no mundo
+
+### PAGE 17: DATA COLLECTION
+**Title:** "Diagnóstico Quase Pronto! Onde Envio Seu Plano de Resgate?"
+**Fields:**
+- Nome completo (required)
+- Email (required)
+- WhatsApp (optional)
+**Text:** "Seu diagnóstico personalizado será enviado instantaneamente. É completamente gratuito e pode salvar o futuro dos seus filhos."
+**Button:** "RECEBER MEU PLANO DE RESGATE AGORA"
+
+### PAGE 18: MINI-VSL PAGE
+**Title:** "SEU DIAGNÓSTICO ESTÁ PRONTO - ASSISTA URGENTE"
+**Subtitle:** "Descubra o nível de risco dos seus filhos e como reverter os danos"
+
+**Content Areas:**
+1. **VSL Video Container** - Create empty div with ID "mini-vsl-container" for video embed
+2. **Text below video:** "⚠️ ATENÇÃO: Este vídeo contém informações científicas sobre os danos permanentes que brigas causam em crianças. Assista até o final para descobrir como proteger seus filhos."
+3. **Button after video:** "QUERO SALVAR MEUS FILHOS AGORA" (links to sales page)
+
+### PAGE 19: FINAL SALES PAGE
+**Headline:** "ÚLTIMA CHANCE: Seus Filhos Não Podem Esperar Mais"
+**Subtitle:** "Seu Plano de Resgate Familiar Está Pronto"
+
+**Product Summary:**
+"Baseado no seu diagnóstico de emergência, criamos um protocolo personalizado de resgate que inclui:"
+
+**Main Product:**
+✅ Método Truque da Briga Zero - VERSÃO EMERGÊNCIA - Para salvar sua família antes que seja tarde demais
+
+**Bonuses:**
+- ✅ BÔNUS 1: WhatsApp da Reconquista - 50 mensagens que fazem ele sorrir
+- ✅ BÔNUS 2: Protocolo Pós-Briga - Como reconquistar depois de discussão  
+- ✅ BÔNUS 3: Manual da Esposa Irresistível - 15 atitudes irresistíveis
+- ✅ BÔNUS 4: Código da Admiração - Como falar dos defeitos sem criticar
+- ✅ BÔNUS 5: Suporte por Email Exclusivo - Tire suas dúvidas diretamente comigo
+- ✅ BÔNUS 6: Acesso VITALÍCIO - Para sempre, sem mensalidades
+
+**Emergency Price:**
+"O futuro dos seus filhos não tem preço, mas este plano de resgate custa apenas R$ 29,90 - menos que uma consulta de psicólogo infantil que você vai precisar se não agir AGORA."
+
+**Guarantee:**
+"🛡️ Garantia de Proteção Familiar - 7 dias
+Se em 7 dias você não vir uma mudança radical nas brigas, devolvemos tudo. Mas pense: você prefere recuperar R$ 29,90 ou recuperar o futuro dos seus filhos?"
+
+**Authority:**
+"Como conselheira matrimonial cristã e mãe, vi famílias inteiras destruídas por brigas que poderiam ter sido evitadas. Não deixe seus filhos se tornarem mais uma estatística. Aja enquanto ainda é tempo."
+
+**Final CTA Button:** "SIM, VOU SALVAR MEUS FILHOS AGORA"
+
+## QUIZ LOGIC & SCORING
+Create scoring system where each answer has emotional weight:
+- Track responses to generate personalized result categories
+- Higher emotional pain = higher urgency in messaging
+- Use answers to customize VSL and sales page messaging
+
+## DESIGN SPECIFICATIONS
+- Color scheme: Deep navy blues (#1a365d), whites, urgent red CTAs (#dc2626)
+- Typography: Bold, readable fonts (Roboto or Montserrat)
+- Mobile responsive breakpoints
+- Smooth fade transitions between questions
+- Progress bar showing completion (Question X of 15)
+- Emergency/urgent design elements
+- Professional, trustworthy appearance with maternal warmth
+
+## SPECIAL REQUIREMENTS
+1. **VSL Integration**: Create empty container with ID "mini-vsl-container" on page 18
+2. **Data Collection**: Ensure form captures and validates all required fields
+3. **Progress Tracking**: Show progress throughout quiz
+4. **Emotional Impact**: Design should convey urgency and maternal protection
+5. **Mobile First**: Optimize for mobile experience
+6. **Smooth Flow**: Seamless transitions between all pages
+7. **CTA Buttons**: Make them prominent and action-oriented
+
+## OUTPUT REQUEST
+Please create a complete HTML file with embedded CSS and JavaScript that includes all 19 pages of this emergency diagnostic quiz system. Ensure all Portuguese text is exactly as provided above, maintain the emotional tone, and create a professional yet urgent design that compels mothers to take action for their children's future.

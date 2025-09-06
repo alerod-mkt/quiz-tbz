@@ -1,0 +1,1146 @@
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico de Emergência - Salve Seus Filhos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                },
+                fontFamily: {
+                    sans: ["Roboto", "system-ui", "sans-serif"],
+                }
+            },
+        }
+    };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --background: hsl(210 40% 98%);
+            --foreground: hsl(215 25% 27%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(215 25% 27%);
+            --primary: hsl(215 50% 25%);
+            --primary-foreground: hsl(0 0% 100%);
+            --secondary: hsl(210 40% 95%);
+            --secondary-foreground: hsl(215 25% 27%);
+            --muted: hsl(210 40% 95%);
+            --muted-foreground: hsl(215 20% 45%);
+            --accent: hsl(210 40% 95%);
+            --accent-foreground: hsl(215 25% 27%);
+            --destructive: hsl(0 84% 60%);
+            --destructive-foreground: hsl(0 0% 100%);
+            --border: hsl(214 32% 91%);
+            --input: hsl(214 32% 91%);
+            --ring: hsl(215 25% 27%);
+            --radius: 0.5rem;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, hsl(215 50% 25%) 0%, hsl(215 40% 30%) 100%);
+            min-height: 100vh;
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .emergency-btn {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+
+        .emergency-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+        }
+
+        .quiz-option {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .quiz-option:hover {
+            border-color: hsl(215 50% 25%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(26, 54, 93, 0.1);
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #dc2626 0%, #f97316 100%);
+            transition: width 0.8s ease;
+        }
+
+        .maternal-warmth {
+            background: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(210 40% 98%) 100%);
+            border: 1px solid hsl(214 32% 91%);
+        }
+
+        .pulse-urgent {
+            animation: pulse-urgent 2s infinite;
+        }
+
+        @keyframes pulse-urgent {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar Container -->
+    <div id="progress-container" class="fixed top-0 left-0 w-full z-50 bg-white shadow-sm" style="display: none;">
+        <div class="max-w-4xl mx-auto px-4 py-3">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-muted-foreground">Progresso do Diagnóstico</span>
+                <span id="progress-text" class="text-sm font-bold text-primary">0 de 15</span>
+            </div>
+            <div class="w-full bg-secondary rounded-full h-2">
+                <div id="progress-bar" class="progress-bar h-2 rounded-full" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 1: EMERGENCY LANDING PAGE -->
+    <div id="page-1" class="page active">
+        <div class="min-h-screen flex items-center justify-center p-4">
+            <div class="max-w-4xl w-full">
+                <!-- Emergency Header -->
+                <div class="text-center mb-8 fade-in">
+                    <div class="inline-flex items-center bg-destructive text-destructive-foreground px-4 py-2 rounded-full text-sm font-bold mb-4 pulse-urgent">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        EMERGÊNCIA FAMILIAR
+                    </div>
+                    <h1 class="text-4xl md:text-6xl font-black text-white leading-tight mb-6">
+                        PARE! SUAS BRIGAS ESTÃO<br>
+                        <span class="text-destructive">CONDENANDO SEUS FILHOS</span>
+                    </h1>
+                    <h2 class="text-xl md:text-2xl font-bold text-white/90 mb-8">
+                        Faça Este Diagnóstico Antes Que o Dano Se Torne Irreversível
+                    </h2>
+                </div>
+
+                <!-- Main Content Card -->
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <p class="text-lg text-foreground mb-8 leading-relaxed">
+                        A cada briga que seus filhos presenciam, você os ensina que casamento é sofrimento. Neurociência confirma: isso causa danos permanentes após os 12 anos. Este diagnóstico revelará o nível de risco e gerará seu plano de resgate:
+                    </p>
+
+                    <!-- Benefits List -->
+                    <div class="space-y-4 mb-10">
+                        <div class="flex items-center">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span class="text-foreground font-medium">O protocolo de emergência para parar as brigas antes que seja tarde demais</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span class="text-foreground font-medium">Como desprogramar seus filhos dos traumas já causados pelas discussões</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span class="text-foreground font-medium">As 3 frases que fazem qualquer marido parar na hora e te respeitar</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span class="text-foreground font-medium">O método para ser ouvida sem destruir a paz da família</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <span class="text-foreground font-medium">Como transformar sua casa de campo de batalha em lar de paz</span>
+                        </div>
+                    </div>
+
+                    <!-- Social Proof -->
+                    <div class="bg-accent rounded-lg p-6 mb-8 text-center">
+                        <div class="flex items-center justify-center mb-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="text-muted-foreground font-medium">
+                            <span class="font-bold text-primary">1.436 mães</span> já salvaram seus casamentos e protegeram o futuro dos filhos
+                        </p>
+                    </div>
+
+                    <!-- CTA Button -->
+                    <button onclick="nextPage()" class="emergency-btn w-full text-white font-bold py-4 px-8 rounded-lg text-lg">
+                        <i class="fas fa-heart mr-3"></i>
+                        QUERO SALVAR MEUS FILHOS AGORA
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUIZ QUESTIONS (Pages 2-16) -->
+    <!-- PAGE 2: QUESTION 1 -->
+    <div id="page-2" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-3xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+                            Seus filhos presenciam suas brigas?
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(1, 'A')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Sim, e isso me mata por dentro todos os dias</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(1, 'B')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Às vezes, mas tento esconder (sei que eles percebem tudo)</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(1, 'C')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Não tenho filhos, mas pretendo ter</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 3: QUESTION 2 -->
+    <div id="page-3" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-3xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+                            Qual a idade dos seus filhos?
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(2, 'A')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Pequenos (0-6 anos) - ainda posso protegê-los</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(2, 'B')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Pré-adolescentes (7-12 anos) - estou na última chance</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(2, 'C')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Adolescentes (13+ anos) - pode ser tarde demais</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 4: QUESTION 3 -->
+    <div id="page-4" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-3xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+                            Com que frequência vocês explodem em discussões?
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(3, 'A')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Várias vezes por semana - virou um inferno</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(3, 'B')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Pelo menos uma vez por semana - intensamente</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(3, 'C')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Algumas vezes por mês, mas são brigas destruidoras</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 5: QUESTION 4 -->
+    <div id="page-5" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-3xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+                            Seus filhos já imploraram para vocês pararem?
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(4, 'A')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Sim, e isso despedaçou meu coração completamente</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(4, 'B')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Eles choram ou ficam apavorados quando brigamos</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(4, 'C')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Vejo o medo nos olhos deles quando começamos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 6: QUESTION 5 -->
+    <div id="page-6" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-3xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+                            Como você se sente sabendo que está prejudicando seus filhos?
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(5, 'A')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Destruída - sou a pior mãe do mundo</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(5, 'B')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Desesperada - não consigo parar mesmo sabendo do mal</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(5, 'C')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Culpada - sei que estou falhando com eles</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 7: QUESTION 6 -->
+    <div id="page-7" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-3xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+                            O que mais te desespera nessas brigas?
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(6, 'A')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Ver o terror nos olhos dos meus filhos</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(6, 'B')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Saber que estou ensinando eles que amor dói</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(6, 'C')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Perceber que eles estão perdendo a inocência</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 8: QUESTION 7 -->
+    <div id="page-8" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-3xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+                            Como seu marido reage durante as discussões?
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(7, 'A')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Grita de volta na frente das crianças</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(7, 'B')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Sai batendo a porta, deixando todos abalados</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(7, 'C')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Fica em silêncio, mas o clima fica pesado por dias</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 9: QUESTION 8 -->
+    <div id="page-9" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-3xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+                            Você percebe seus filhos mudando por causa das brigas?
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(8, 'A')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Sim, eles estão mais agressivos e nervosos</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(8, 'B')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Ficaram mais quietos e retraídos</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(8, 'C')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Começaram a ter pesadelos ou problemas na escola</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 10: QUESTION 9 -->
+    <div id="page-10" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-3xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+                            Você tem medo de estar traumatizando seus filhos para sempre?
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(9, 'A')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Sim, tenho pavor de estar destruindo eles</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(9, 'B')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Morro de medo de que eles me odeiem no futuro</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(9, 'C')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Tenho certeza de que já causei danos irreparáveis</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 11: QUESTION 10 -->
+    <div id="page-11" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-3xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+                            Como você se sente quando vê outros casais harmoniosos com filhos?
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(10, 'A')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Morto de inveja - queria que fossem meus filhos</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(10, 'B')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Devastada - sei que meus filhos merecem isso</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(10, 'C')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Envergonhada - sou um exemplo terrível de mãe</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 12: QUESTION 11 -->
+    <div id="page-12" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-3xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+                            Qual seu maior medo sobre o futuro dos seus filhos?
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(11, 'A')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Que tenham relacionamentos tóxicos por minha culpa</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(11, 'B')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Que nunca consigam ser felizes no amor</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(11, 'C')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Que me culpem para sempre por ter arruinado eles</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 13: QUESTION 12 -->
+    <div id="page-13" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-3xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+                            Você já teve pesadelos com seus filhos adultos te confrontando?
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(12, 'A')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Sim, acordo suando pensando nisso</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(12, 'B')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Tenho pavor do dia em que eles me perguntarem "por quê?"</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(12, 'C')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Sei que um dia vão me odiar pelo que fiz</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 14: QUESTION 13 -->
+    <div id="page-14" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-3xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+                            Você faria QUALQUER COISA para proteger seus filhos agora?
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(13, 'A')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">SIM! Qualquer sacrifício pelos meus filhos</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(13, 'B')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Com certeza, eles são minha prioridade absoluta</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(13, 'C')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Sem dúvida, não posso falhar mais com eles</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 15: QUESTION 14 -->
+    <div id="page-15" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-3xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+                            Se pudesse voltar no tempo e mudar tudo em 7 dias, mudaria?
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(14, 'A')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Imediatamente, daria qualquer coisa por essa chance</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(14, 'B')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Sem hesitar, não aguento mais ver eles sofrendo</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(14, 'C')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">É meu último desejo na vida - salvar meus filhos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 16: QUESTION 15 -->
+    <div id="page-16" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-3xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+                            Quanto vale o futuro e felicidade dos seus filhos?
+                        </h2>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(15, 'A')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Não tem preço - são meus tesouros mais preciosos</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(15, 'B')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">Vale minha própria vida - faria qualquer coisa por eles</span>
+                            </div>
+                        </div>
+                        <div class="quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer" onclick="selectAnswer(15, 'C')">
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0"></div>
+                                <span class="text-foreground font-medium">É mais importante que qualquer outra coisa no mundo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 17: DATA COLLECTION -->
+    <div id="page-17" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-3xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4">
+                            Diagnóstico Quase Pronto! Onde Envio Seu Plano de Resgate?
+                        </h2>
+                        <p class="text-muted-foreground">
+                            Seu diagnóstico personalizado será enviado instantaneamente. É completamente gratuito e pode salvar o futuro dos seus filhos.
+                        </p>
+                    </div>
+                    
+                    <form id="lead-form" class="space-y-6">
+                        <div>
+                            <label for="nome" class="block text-sm font-medium text-foreground mb-2">Nome Completo *</label>
+                            <input type="text" id="nome" name="nome" required 
+                                   class="w-full px-4 py-3 border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent"
+                                   placeholder="Digite seu nome completo">
+                        </div>
+                        
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-foreground mb-2">Email *</label>
+                            <input type="email" id="email" name="email" required 
+                                   class="w-full px-4 py-3 border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent"
+                                   placeholder="Digite seu melhor email">
+                        </div>
+                        
+                        <div>
+                            <label for="whatsapp" class="block text-sm font-medium text-foreground mb-2">WhatsApp (opcional)</label>
+                            <input type="tel" id="whatsapp" name="whatsapp" 
+                                   class="w-full px-4 py-3 border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent"
+                                   placeholder="(11) 99999-9999">
+                        </div>
+                        
+                        <button type="submit" class="emergency-btn w-full text-white font-bold py-4 px-8 rounded-lg text-lg">
+                            <i class="fas fa-heart mr-3"></i>
+                            RECEBER MEU PLANO DE RESGATE AGORA
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 18: MINI-VSL PAGE -->
+    <div id="page-18" class="page">
+        <div class="min-h-screen flex items-center justify-center p-4 pt-20">
+            <div class="max-w-4xl w-full">
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl md:text-4xl font-bold text-primary mb-4">
+                            SEU DIAGNÓSTICO ESTÁ PRONTO - ASSISTA URGENTE
+                        </h2>
+                        <p class="text-lg text-muted-foreground">
+                            Descubra o nível de risco dos seus filhos e como reverter os danos
+                        </p>
+                    </div>
+
+                    <!-- VSL Video Container -->
+                    <div id="mini-vsl-container" class="bg-black rounded-xl mb-8 aspect-video flex items-center justify-center">
+                        <div class="text-center text-white">
+                            <i class="fas fa-play-circle text-6xl mb-4 opacity-70"></i>
+                            <p class="text-lg">Container para Vídeo VSL</p>
+                            <p class="text-sm opacity-70">Integração com player de vídeo</p>
+                        </div>
+                    </div>
+
+                    <!-- Warning Text -->
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-8 rounded-r-lg">
+                        <div class="flex">
+                            <div class="ml-3">
+                                <p class="text-sm text-yellow-800">
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                                    <strong>ATENÇÃO:</strong> Este vídeo contém informações científicas sobre os danos permanentes que brigas causam em crianças. Assista até o final para descobrir como proteger seus filhos.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CTA Button -->
+                    <button onclick="nextPage()" class="emergency-btn w-full text-white font-bold py-4 px-8 rounded-lg text-lg">
+                        <i class="fas fa-heart mr-3"></i>
+                        QUERO SALVAR MEUS FILHOS AGORA
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 19: FINAL SALES PAGE -->
+    <div id="page-19" class="page">
+        <div class="min-h-screen py-8 px-4 pt-20">
+            <div class="max-w-4xl mx-auto">
+                <!-- Header -->
+                <div class="text-center mb-12 fade-in">
+                    <div class="inline-flex items-center bg-destructive text-destructive-foreground px-4 py-2 rounded-full text-sm font-bold mb-4 pulse-urgent">
+                        <i class="fas fa-clock mr-2"></i>
+                        ÚLTIMA CHANCE
+                    </div>
+                    <h1 class="text-3xl md:text-5xl font-black text-white leading-tight mb-4">
+                        ÚLTIMA CHANCE: Seus Filhos<br>
+                        <span class="text-destructive">Não Podem Esperar Mais</span>
+                    </h1>
+                    <h2 class="text-xl md:text-2xl font-bold text-white/90">
+                        Seu Plano de Resgate Familiar Está Pronto
+                    </h2>
+                </div>
+
+                <!-- Main Sales Container -->
+                <div class="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in">
+                    <!-- Product Summary -->
+                    <div class="mb-10">
+                        <p class="text-lg text-foreground mb-6 leading-relaxed">
+                            Baseado no seu diagnóstico de emergência, criamos um protocolo personalizado de resgate que inclui:
+                        </p>
+
+                        <!-- Main Product -->
+                        <div class="bg-primary text-primary-foreground rounded-xl p-6 mb-8">
+                            <div class="flex items-center mb-4">
+                                <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-check text-primary text-sm"></i>
+                                </div>
+                                <h3 class="text-xl font-bold">Método Truque da Briga Zero - VERSÃO EMERGÊNCIA</h3>
+                            </div>
+                            <p class="text-primary-foreground/90">Para salvar sua família antes que seja tarde demais</p>
+                        </div>
+
+                        <!-- Bonuses -->
+                        <div class="space-y-4 mb-10">
+                            <h3 class="text-xl font-bold text-primary mb-6">Bônus Exclusivos Inclusos:</h3>
+                            
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-check text-white text-sm"></i>
+                                </div>
+                                <span class="text-foreground font-medium"><strong>BÔNUS 1:</strong> WhatsApp da Reconquista - 50 mensagens que fazem ele sorrir</span>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-check text-white text-sm"></i>
+                                </div>
+                                <span class="text-foreground font-medium"><strong>BÔNUS 2:</strong> Protocolo Pós-Briga - Como reconquistar depois de discussão</span>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-check text-white text-sm"></i>
+                                </div>
+                                <span class="text-foreground font-medium"><strong>BÔNUS 3:</strong> Manual da Esposa Irresistível - 15 atitudes irresistíveis</span>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-check text-white text-sm"></i>
+                                </div>
+                                <span class="text-foreground font-medium"><strong>BÔNUS 4:</strong> Código da Admiração - Como falar dos defeitos sem criticar</span>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-check text-white text-sm"></i>
+                                </div>
+                                <span class="text-foreground font-medium"><strong>BÔNUS 5:</strong> Suporte por Email Exclusivo - Tire suas dúvidas diretamente comigo</span>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                    <i class="fas fa-check text-white text-sm"></i>
+                                </div>
+                                <span class="text-foreground font-medium"><strong>BÔNUS 6:</strong> Acesso VITALÍCIO - Para sempre, sem mensalidades</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Emergency Price -->
+                    <div class="bg-accent rounded-xl p-8 mb-8 text-center">
+                        <h3 class="text-2xl font-bold text-primary mb-4">Investimento de Emergência</h3>
+                        <p class="text-lg text-foreground mb-6">
+                            O futuro dos seus filhos não tem preço, mas este plano de resgate custa apenas:
+                        </p>
+                        <div class="text-5xl font-black text-destructive mb-2">R$ 29,90</div>
+                        <p class="text-muted-foreground">
+                            Menos que uma consulta de psicólogo infantil que você vai precisar se não agir AGORA.
+                        </p>
+                    </div>
+
+                    <!-- Guarantee -->
+                    <div class="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-shield-alt text-green-600 text-2xl mr-3"></i>
+                            <h3 class="text-xl font-bold text-green-800">Garantia de Proteção Familiar - 7 dias</h3>
+                        </div>
+                        <p class="text-green-700">
+                            Se em 7 dias você não vir uma mudança radical nas brigas, devolvemos tudo. Mas pense: você prefere recuperar R$ 29,90 ou recuperar o futuro dos seus filhos?
+                        </p>
+                    </div>
+
+                    <!-- Authority -->
+                    <div class="bg-primary/5 border border-primary/20 rounded-xl p-6 mb-8">
+                        <p class="text-foreground italic">
+                            "Como conselheira matrimonial cristã e mãe, vi famílias inteiras destruídas por brigas que poderiam ter sido evitadas. Não deixe seus filhos se tornarem mais uma estatística. Aja enquanto ainda é tempo."
+                        </p>
+                    </div>
+
+                    <!-- Final CTA -->
+                    <button class="emergency-btn w-full text-white font-bold py-6 px-8 rounded-lg text-xl pulse-urgent">
+                        <i class="fas fa-heart mr-3"></i>
+                        SIM, VOU SALVAR MEUS FILHOS AGORA
+                    </button>
+
+                    <!-- Security badges -->
+                    <div class="flex items-center justify-center mt-6 space-x-4 text-muted-foreground text-sm">
+                        <div class="flex items-center">
+                            <i class="fas fa-lock mr-2"></i>
+                            Compra Segura
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-shield-alt mr-2"></i>
+                            Garantia 7 dias
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-infinity mr-2"></i>
+                            Acesso Vitalício
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Quiz state management
+        let currentPage = 1;
+        let quizAnswers = {};
+        let quizStarted = false;
+
+        // Initialize progress bar on quiz start
+        function startQuiz() {
+            quizStarted = true;
+            document.getElementById('progress-container').style.display = 'block';
+            updateProgress();
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            if (!quizStarted) return;
+            
+            const totalQuestions = 15;
+            const currentQuestion = Math.max(0, Math.min(currentPage - 1, totalQuestions));
+            const percentage = (currentQuestion / totalQuestions) * 100;
+            
+            document.getElementById('progress-bar').style.width = percentage + '%';
+            document.getElementById('progress-text').textContent = currentQuestion + ' de ' + totalQuestions;
+        }
+
+        // Navigate to next page
+        function nextPage() {
+            const current = document.getElementById(`page-${currentPage}`);
+            const next = document.getElementById(`page-${currentPage + 1}`);
+            
+            if (next) {
+                current.classList.remove('active');
+                currentPage++;
+                next.classList.add('active');
+                
+                // Start quiz tracking on page 2
+                if (currentPage === 2) {
+                    startQuiz();
+                }
+                
+                // Hide progress on data collection page and beyond
+                if (currentPage >= 17) {
+                    document.getElementById('progress-container').style.display = 'none';
+                }
+                
+                updateProgress();
+                window.scrollTo(0, 0);
+            }
+        }
+
+        // Handle quiz answer selection
+        function selectAnswer(questionNum, answer) {
+            // Store answer
+            quizAnswers[questionNum] = answer;
+            
+            // Visual feedback
+            const options = document.querySelectorAll(`#page-${currentPage + 1} .quiz-option`);
+            options.forEach(option => {
+                const circle = option.querySelector('.w-6.h-6');
+                circle.classList.remove('bg-primary');
+                circle.innerHTML = '';
+            });
+            
+            // Mark selected option
+            const selectedOption = event.currentTarget;
+            const selectedCircle = selectedOption.querySelector('.w-6.h-6');
+            selectedCircle.classList.add('bg-primary');
+            selectedCircle.innerHTML = '<i class="fas fa-check text-white text-sm"></i>';
+            
+            // Auto-advance after short delay
+            setTimeout(() => {
+                nextPage();
+            }, 800);
+        }
+
+        // Handle form submission
+        document.getElementById('lead-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(this);
+            const leadData = {
+                nome: formData.get('nome'),
+                email: formData.get('email'),
+                whatsapp: formData.get('whatsapp'),
+                answers: quizAnswers
+            };
+            
+            // TODO: Send data to backend/CRM
+            console.log('Lead data collected:', leadData);
+            
+            // Proceed to VSL page
+            nextPage();
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial state
+            updateProgress();
+            
+            // Add smooth scrolling
+            document.documentElement.style.scrollBehavior = 'smooth';
+        });
+
+        // Add click handlers for quiz options
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.quiz-option')) {
+                const option = e.target.closest('.quiz-option');
+                const page = option.closest('.page');
+                const pageId = page.id;
+                const questionNum = parseInt(pageId.split('-')[1]) - 1;
+                
+                // Get answer from option position
+                const options = page.querySelectorAll('.quiz-option');
+                const answerIndex = Array.from(options).indexOf(option);
+                const answers = ['A', 'B', 'C'];
+                const answer = answers[answerIndex];
+                
+                if (questionNum >= 1 && questionNum <= 15) {
+                    selectAnswer(questionNum, answer);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
