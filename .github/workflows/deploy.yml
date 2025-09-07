@@ -1,22 +1,55 @@
-name: 🚀 Deploy Automático
-
+name: 🚀 Deploy Automático - Debug
 on:
   push:
     branches: [ main ]
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     name: Deploy para Servidor
     
     steps:
+    - name: 🔍 Debug - Teste de conectividade
+      run: |
+        echo "🔍 Testando conectividade com o servidor..."
+        ping -c 2 ${{ secrets.SERVER_HOST }} || echo "❌ Ping falhou, mas isso é normal em alguns servidores"
+        
     - name: 🚀 Executar Deploy
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
+        username: root
         key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: 22
+        timeout: 180s
+        command_timeout: 20m
+        debug: true
         script: |
-          echo "🚀 Iniciando deploy automático..."
-          /opt/deploy-scripts/update-quiz.sh
-          echo "✅ Deploy finalizado!"
+          set -e
+          echo "🚀 Deploy iniciado em: $(date)"
+          echo "👤 Usuário conectado: $(whoami)"
+          echo "🏠 Diretório home: $HOME"
+          echo "📍 Diretório atual: $(pwd)"
+          echo "🖥️  Hostname: $(hostname)"
+          echo ""
+          
+          echo "🔍 Verificando script de deploy..."
+          if [ -f "/opt/deploy-scripts/update-quiz.sh" ]; then
+            echo "✅ Script encontrado!"
+            echo "📋 Permissões do script:"
+            ls -la /opt/deploy-scripts/update-quiz.sh
+            
+            echo "🔧 Garantindo permissão de execução..."
+            chmod +x /opt/deploy-scripts/update-quiz.sh
+            
+            echo "🚀 Executando deploy..."
+            /opt/deploy-scripts/update-quiz.sh
+            
+            echo "✅ Deploy concluído em: $(date)"
+          else
+            echo "❌ ERRO: Script não encontrado em /opt/deploy-scripts/update-quiz.sh"
+            echo "📂 Listando diretório /opt/:"
+            ls -la /opt/ || echo "Diretório /opt não existe"
+            echo "📂 Listando /opt/deploy-scripts/ se existir:"
+            ls -la /opt/deploy-scripts/ || echo "Diretório /opt/deploy-scripts não existe"
+            exit 1
+          fi
