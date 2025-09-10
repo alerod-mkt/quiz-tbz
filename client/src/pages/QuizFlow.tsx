@@ -76,6 +76,8 @@ export default function QuizFlow() {
     const currentQuestionNumber = currentQuestionIndex + 1; // Pergunta atual (1-15)
     
     console.log(`🎯 handleQuizAnswer: pergunta ${currentQuestionNumber}, resposta: ${answer}`);
+    console.log(`🔍 DEBUG: currentQuestionIndex=${currentQuestionIndex}, QUIZ_QUESTIONS.length=${QUIZ_QUESTIONS.length}`);
+    console.log(`🔍 DEBUG: Condição (currentQuestionIndex < QUIZ_QUESTIONS.length - 1) = ${currentQuestionIndex < QUIZ_QUESTIONS.length - 1}`);
     
     // Salvar resposta
     const newAnswers = {
@@ -89,6 +91,8 @@ export default function QuizFlow() {
       const etapaOrigem = currentQuestionNumber === 1 ? 'quiz_inicio' : `quiz_pergunta_${currentQuestionNumber}`;
       const etapaDestino = `quiz_pergunta_${currentQuestionNumber + 1}`;
       
+      console.log(`🔄 Avançando para próxima pergunta: ${etapaOrigem} -> ${etapaDestino}`);
+      
       await apiRequest('POST', '/api/metrics/conversion', { etapaOrigem, etapaDestino });
       await apiRequest('POST', '/api/metrics/visitor', { etapa: etapaDestino });
       console.log(`✅ Conversão ${etapaOrigem} -> ${etapaDestino} e visita ${etapaDestino} registradas`);
@@ -98,11 +102,21 @@ export default function QuizFlow() {
       // Última pergunta - rastrear conversão para VSL e visita VSL
       const etapaOrigem = `quiz_pergunta_${currentQuestionNumber}`;
       
-      await apiRequest('POST', '/api/metrics/conversion', { etapaOrigem, etapaDestino: 'vsl' });
-      await apiRequest('POST', '/api/metrics/visitor', { etapa: 'vsl' });
-      console.log(`✅ Conversão ${etapaOrigem} -> vsl e visita VSL registradas`);
+      console.log(`🏁 ÚLTIMA PERGUNTA! Transitioning para VSL: ${etapaOrigem} -> vsl`);
       
-      setCurrentPage('vsl');
+      try {
+        await apiRequest('POST', '/api/metrics/conversion', { etapaOrigem, etapaDestino: 'vsl' });
+        await apiRequest('POST', '/api/metrics/visitor', { etapa: 'vsl' });
+        console.log(`✅ Conversão ${etapaOrigem} -> vsl e visita VSL registradas`);
+        
+        console.log(`🎬 Chamando setCurrentPage('vsl')...`);
+        setCurrentPage('vsl');
+        console.log(`🎬 setCurrentPage('vsl') chamado com sucesso!`);
+      } catch (error) {
+        console.error('❌ Erro ao transitar para VSL:', error);
+        // Mesmo com erro no tracking, navegar para VSL
+        setCurrentPage('vsl');
+      }
     }
   };
 

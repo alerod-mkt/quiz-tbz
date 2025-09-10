@@ -8,6 +8,8 @@ interface EmergencyButtonProps {
   isPulse?: boolean;
   size?: "default" | "large";
   disabled?: boolean;
+  id?: string;
+  "data-testid"?: string;
 }
 
 export default function EmergencyButton({ 
@@ -16,7 +18,9 @@ export default function EmergencyButton({
   type = "button", 
   isPulse = false,
   size = "default",
-  disabled = false
+  disabled = false,
+  id,
+  "data-testid": dataTestId = "emergency-button"
 }: EmergencyButtonProps) {
   const sizeClasses = size === "large" 
     ? "py-6 px-8 text-xl" 
@@ -27,12 +31,13 @@ export default function EmergencyButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
+      id={id}
       className={`emergency-btn w-full text-white font-bold rounded-lg ${sizeClasses} ${
         isPulse ? 'pulse-urgent' : ''
       } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       whileHover={disabled ? {} : { scale: 1.02 }}
       whileTap={disabled ? {} : { scale: 0.98 }}
-      data-testid="emergency-button"
+      data-testid={dataTestId}
     >
       <div className="flex items-center justify-center">
         <Heart className="mr-3" />

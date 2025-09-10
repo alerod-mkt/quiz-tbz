@@ -1,24 +1,18 @@
 version: "3.7"
 services: 
   quiz_tbz:
-    image: node:18-alpine
+    image: node:20-alpine
     volumes:
       - quiz_tbz_data:/app
     networks:
       - network_public
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - PORT=5000
+      - PWD=/app
+      - VITE_ROOT=/app
     working_dir: /app
-    command: sh -c "
-      if [ -f projeto.zip ]; then 
-        apk add --no-cache unzip && 
-        unzip -o projeto.zip && 
-        rm projeto.zip
-      fi &&
-      npm install && 
-      npm run build && 
-      npm start"
+    command: sh -c "npm install --include=dev && NODE_ENV=development npx tsx server/index.ts"
     deploy:
       mode: replicated
       replicas: 1

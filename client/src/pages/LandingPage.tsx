@@ -104,7 +104,7 @@ export default function LandingPage({ onStart }: LandingPageProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 1 }}
           >
-            <EmergencyButton onClick={onStart}>
+            <EmergencyButton onClick={onStart} id="CliqueIq">
               QUERO SALVAR MEUS FILHOS AGORA
             </EmergencyButton>
           </motion.div>

@@ -201,19 +201,19 @@ export const trackQuestionConversion = async (questionNumber: number) => {
   // Não faz nada - a lógica foi movida para o handleQuizAnswer
 };
 
-// Função para rastrear conversão da página de vendas
+// Função para rastrear conversão da página de vendas (ADD TO CART)
 export const trackSalesConversion = async () => {
-  console.log('🎯 trackSalesConversion chamado:', { sessionId, sessionInitialized });
+  console.log('🛒 trackSalesConversion (ADD TO CART) chamado:', { sessionId, sessionInitialized });
   
   const executeTrack = async () => {
     if (sessionId) {
       try {
-        // Registra conversão da página de vendas
+        // Registra conversão da página de vendas (ADD TO CART)
         await apiRequest('POST', '/api/metrics/conversion', { 
           etapaOrigem: 'sales', 
           etapaDestino: 'sales_conversion' 
         });
-        console.log('✅ Conversão da página de vendas rastreada');
+        console.log('✅ Conversão da página de vendas (ADD TO CART) rastreada');
       } catch (error) {
         console.error('❌ Erro ao rastrear conversão da página de vendas:', error);
       }
@@ -229,6 +229,9 @@ export const trackSalesConversion = async () => {
     actionQueue.push(executeTrack);
   }
 };
+
+// Função específica para rastrear ADD TO CART (alias para trackSalesConversion)
+export const trackAddToCart = trackSalesConversion;
 
 // Hook para rastrear tempo em uma página
 export const useTrackTime = (etapa: string) => {

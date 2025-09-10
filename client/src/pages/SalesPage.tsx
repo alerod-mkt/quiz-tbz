@@ -1,11 +1,10 @@
 import { motion } from "framer-motion";
 import { Clock, Check, Shield, Infinity, Lock, AlertTriangle, Target, Star, Award, Zap, Heart, Users, TrendingUp, Eye } from "lucide-react";
-import EmergencyButton from "@/components/EmergencyButton";
-import { useEffect } from "react";
+import { useState } from 'react';
+import CheckoutPopup from '@/components/CheckoutPopup';
 
 import { QuizAnswers } from "@/types/quiz";
-import { trackCheckoutStarted, useTrackVisitor } from '@/hooks/use-metrics';
-import { apiRequest } from "@/lib/queryClient";
+import { useTrackVisitor, trackAddToCart } from '@/hooks/use-metrics';
 
 interface SalesPageProps {
   quizAnswers?: QuizAnswers;
@@ -15,26 +14,30 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
   // Rastrear visitante na página de vendas
   useTrackVisitor('sales');
   
+  // Estado para controlar o popup de checkout
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   
-  const handleCheckoutClick = async () => {
+  // Função para abrir popup e rastrear ADD TO CART
+  const handleOpenCheckout = async () => {
     try {
-      console.log('🎯 handleCheckoutClick: rastreando conversão da página de vendas');
+      console.log('🛒 Abrindo checkout popup e rastreando ADD TO CART');
       
-      // 1. Rastrear conversão da página de vendas (mesma lógica dos outros botões)
-      await apiRequest('POST', '/api/metrics/conversion', { etapaOrigem: 'sales', etapaDestino: 'sales_conversion' });
-      console.log('✅ Conversão sales->sales_conversion registrada');
+      // 1. Rastrear ADD TO CART
+      await trackAddToCart();
+      console.log('✅ ADD TO CART registrado');
       
-      // 2. Rastrear checkout iniciado (que já inclui initiate checkout)
-      await trackCheckoutStarted();
+      // 2. Abrir popup
+      setIsPopupOpen(true);
       
-      // 3. Redirecionar para o checkout
-      window.open('https://pay.kiwify.com.br/YVVaWGV', '_blank');
     } catch (error) {
-      console.error('Erro ao rastrear conversões:', error);
-      // Mesmo com erro no tracking, permite continuar para o checkout
-      window.open('https://pay.kiwify.com.br/YVVaWGV', '_blank');
+      console.error('Erro ao rastrear ADD TO CART:', error);
+      // Mesmo com erro, abre o popup
+      setIsPopupOpen(true);
     }
   };
+  
+  
+
   // Calcula resultado do diagnóstico
   const calculateDiagnostic = (answers: QuizAnswers): string => {
     if (!answers || Object.keys(answers).length === 0) return 'URGÊNCIA CRÍTICA';
@@ -375,16 +378,16 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
               </div>
             </div>
             
-            {/* Botão Verde na Seção de Preço */}
+            {/* Botão Verde na Seção de Preço - Abre Popup */}
             <div className="flex justify-center">
-              <EmergencyButton
-                onClick={handleCheckoutClick}
-                size="large"
-                isPulse={true}
+              <button 
+                onClick={handleOpenCheckout}
+                id="oferta_29"
                 data-testid="price-section-button"
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-green-600 hover:bg-green-700 text-white h-14 px-8 py-4 text-lg font-bold animate-pulse shadow-2xl transform hover:scale-105 transition-all duration-300"
               >
                 🛒 QUERO SALVAR MEUS FILHOS AGORA - R$ 29,90
-              </EmergencyButton>
+              </button>
             </div>
           </motion.div>
 
@@ -473,20 +476,20 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
             </p>
           </motion.div>
 
-          {/* Final CTA */}
+          {/* Final CTA - Abre Popup */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 2.7 }}
           >
-            <EmergencyButton
-              onClick={handleCheckoutClick}
-              size="large"
-              isPulse={true}
+            <button 
+              onClick={handleOpenCheckout}
+              id="oferta_29"
               data-testid="checkout-button"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-green-600 hover:bg-green-700 text-white h-14 px-8 py-4 text-lg font-bold animate-pulse shadow-2xl transform hover:scale-105 transition-all duration-300 w-full"
             >
               🛒 QUERO SALVAR MEUS FILHOS AGORA - R$ 29,90
-            </EmergencyButton>
+            </button>
           </motion.div>
 
           {/* Thank you message */}
@@ -502,6 +505,12 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
             </div>
           </motion.div>
         </motion.div>
+        
+        {/* Popup de Checkout */}
+        <CheckoutPopup 
+          isOpen={isPopupOpen} 
+          onClose={() => setIsPopupOpen(false)} 
+        />
       </div>
     </div>
   );

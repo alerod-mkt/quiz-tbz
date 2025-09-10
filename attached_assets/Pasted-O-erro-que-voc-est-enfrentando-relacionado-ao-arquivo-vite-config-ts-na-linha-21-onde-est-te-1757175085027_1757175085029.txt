@@ -1,0 +1,132 @@
+O erro que você está enfrentando é relacionado ao arquivo `vite.config.ts` na linha 21, onde está tentando usar `path.resolve()` com um valor `undefined`. Isso geralmente acontece quando uma variável de ambiente ou parâmetro necessário não está definido.
+
+Aqui estão as soluções para resolver esse problema:
+
+## 1. Verificar o arquivo vite.config.ts
+
+Primeiro, verifique a linha 21 do seu `vite.config.ts`. Provavelmente há algo como:
+
+```typescript
+// Problema comum:
+resolve: {
+  alias: {
+    '@': path.resolve(__dirname, process.env.SOME_VAR), // Se SOME_VAR for undefined
+  }
+}
+```
+
+## 2. Soluções no Docker Compose
+
+### Opção A: Adicionar variáveis de ambiente necessárias
+
+```yaml
+version: "3.7"
+services: 
+  quiz_tbz:
+    image: node:18-alpine
+    volumes:
+      - quiz_tbz_data:/app
+    networks:
+      - network_public
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - VITE_ROOT=${PWD} # ou um caminho específico
+      # Adicione outras variáveis que o vite.config.ts possa precisar
+    working_dir: /app
+    command: sh -c "npm install --include=dev && NODE_ENV=development npx tsx server/index.ts"
+    # resto da configuração...
+```
+
+### Opção B: Usar bind mount para desenvolvimento
+
+```yaml
+version: "3.7"
+services: 
+  quiz_tbz:
+    image: node:18-alpine
+    volumes:
+      - ./:/app  # Use bind mount ao invés de volume nomeado para desenvolvimento
+      - /app/node_modules  # Evita conflitos com node_modules local
+    networks:
+      - network_public
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+    working_dir: /app
+    command: sh -c "npm install --include=dev && NODE_ENV=development npx tsx server/index.ts"
+    # resto da configuração...
+```
+
+## 3. Corrigir o vite.config.ts
+
+Se você tiver acesso ao arquivo, pode fazer uma correção defensiva:
+
+```typescript
+import { defineConfig } from 'vite'
+import path from 'path'
+
+export default defineConfig({
+  // ... outras configurações
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, process.env.VITE_SRC_PATH || './src'),
+      // Use valores padrão quando a variável for undefined
+    }
+  }
+})
+```
+
+## 4. Alternativa com Dockerfile
+
+Se o problema persistir, considere usar um Dockerfile customizado:
+
+```dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copie apenas package files primeiro para cache do Docker
+COPY package*.json ./
+
+# Instale dependências
+RUN npm install --include=dev
+
+# Copie o resto do código
+COPY . .
+
+# Defina variáveis de ambiente padrão
+ENV NODE_ENV=development
+ENV PORT=5000
+
+EXPOSE 5000
+
+CMD ["npx", "tsx", "server/index.ts"]
+```
+
+E ajuste o docker-compose:
+
+```yaml
+version: "3.7"
+services: 
+  quiz_tbz:
+    build: .  # Use build ao invés de image
+    volumes:
+      - quiz_tbz_data:/app/data  # Monte apenas dados persistentes
+    networks:
+      - network_public
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+    # resto da configuração...
+```
+
+## 5. Debug do problema
+
+Para investigar melhor, você pode temporariamente modificar o comando para debug:
+
+```yaml
+command: sh -c "ls -la && cat vite.config.ts && npm install --include=dev && NODE_ENV=development npx tsx server/index.ts"
+```
+
+A solução mais provável é a **Opção B** (usar bind mount) se você estiver em desenvolvimento, ou corrigir as variáveis de ambiente no `vite.config.ts` para ter valores padrão quando forem `undefined`.
