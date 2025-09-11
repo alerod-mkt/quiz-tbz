@@ -5,6 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+// Declaração para Dimple Analytics
+declare global {
+  interface Window {
+    trk?: any;
+    dimppleLoaded?: boolean;
+  }
+}
+
 interface CheckoutPopupProps {
   isOpen: boolean;
   onClose: () => void;
@@ -23,6 +31,18 @@ export default function CheckoutPopup({ isOpen, onClose }: CheckoutPopupProps) {
     setIsSubmitting(true);
 
     try {
+      // Tracking para Dimple - compatibilidade mobile INITIATE CHECKOUT
+      try {
+        if (window.trk) {
+          console.log('📊 Dimple tracking: chk_29 clicado - INITIATE CHECKOUT');
+          (window as any).trk('track', 'conversion', { id: 'chk_29' });
+        } else {
+          console.warn('⚠️ Dimple não disponível para tracking chk_29');
+        }
+      } catch (dimpleError) {
+        console.error('❌ Erro no tracking Dimple chk_29:', dimpleError);
+      }
+      
       // Simular um pequeno delay para melhor UX
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -157,9 +177,21 @@ export default function CheckoutPopup({ isOpen, onClose }: CheckoutPopupProps) {
           <Button
             type="submit"
             id="chk_29"
+            onTouchStart={(e) => {
+              // Evento específico para mobile
+              console.log('📱 Touch event chk_29 - INITIATE CHECKOUT');
+              try {
+                if (window.trk) {
+                  (window as any).trk('track', 'conversion', { id: 'chk_29', event: 'touch' });
+                }
+              } catch (error) {
+                console.error('❌ Erro touch tracking chk_29:', error);
+              }
+            }}
             disabled={isSubmitting || !formData.email || !formData.nomeCompleto || !formData.celular}
             className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 text-lg rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             data-testid="submit-checkout"
+            data-dimple-id="chk_29"
           >
             {isSubmitting ? (
               <div className="flex items-center justify-center gap-2">

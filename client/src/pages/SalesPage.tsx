@@ -6,6 +6,14 @@ import CheckoutPopup from '@/components/CheckoutPopup';
 import { QuizAnswers } from "@/types/quiz";
 import { useTrackVisitor, trackAddToCart } from '@/hooks/use-metrics';
 
+// Declaração para Dimple Analytics
+declare global {
+  interface Window {
+    trk?: any;
+    dimppleLoaded?: boolean;
+  }
+}
+
 interface SalesPageProps {
   quizAnswers?: QuizAnswers;
 }
@@ -18,9 +26,21 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   
   // Função para abrir popup e rastrear ADD TO CART
-  const handleOpenCheckout = async () => {
+  const handleOpenCheckout = async (event?: React.MouseEvent | TouchEvent) => {
     try {
       console.log('🛒 Abrindo checkout popup e rastreando ADD TO CART');
+      
+      // Tracking para Dimple - compatibilidade mobile
+      try {
+        if (window.trk) {
+          console.log('📊 Dimple tracking: oferta_29 clicado');
+          (window as any).trk('track', 'conversion', { id: 'oferta_29' });
+        } else {
+          console.warn('⚠️ Dimple não disponível para tracking oferta_29');
+        }
+      } catch (dimpleError) {
+        console.error('❌ Erro no tracking Dimple:', dimpleError);
+      }
       
       // 1. Rastrear ADD TO CART
       await trackAddToCart();
@@ -382,7 +402,19 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
             <div className="flex justify-center">
               <button 
                 onClick={handleOpenCheckout}
+                onTouchStart={(e) => {
+                  // Evento específico para mobile
+                  console.log('📱 Touch event oferta_29');
+                  try {
+                    if (window.trk) {
+                      (window as any).trk('track', 'conversion', { id: 'oferta_29', event: 'touch' });
+                    }
+                  } catch (error) {
+                    console.error('❌ Erro touch tracking:', error);
+                  }
+                }}
                 id="oferta_29"
+                data-dimple-id="oferta_29"
                 data-testid="price-section-button"
                 className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-green-600 hover:bg-green-700 text-white h-14 px-8 py-4 text-lg font-bold animate-pulse shadow-2xl transform hover:scale-105 transition-all duration-300"
               >
@@ -484,7 +516,19 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
           >
             <button 
               onClick={handleOpenCheckout}
+              onTouchStart={(e) => {
+                // Evento específico para mobile
+                console.log('📱 Touch event oferta_29 final');
+                try {
+                  if (window.trk) {
+                    (window as any).trk('track', 'conversion', { id: 'oferta_29', event: 'touch' });
+                  }
+                } catch (error) {
+                  console.error('❌ Erro touch tracking:', error);
+                }
+              }}
               id="oferta_29"
+              data-dimple-id="oferta_29"
               data-testid="checkout-button"
               className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-green-600 hover:bg-green-700 text-white h-14 px-8 py-4 text-lg font-bold animate-pulse shadow-2xl transform hover:scale-105 transition-all duration-300 w-full"
             >

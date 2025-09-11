@@ -3,12 +3,48 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <!-- Dimpple Analytics Tracking Pixel -->
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <!-- Dimpple Analytics Tracking Pixel - Mobile Compatible -->
     <script type="text/javascript">
-        (function(g,u,r,i,d,e,a){g.DimppleAnalyticsObject=d;if(!(d in g)){g[d]=function(){
-        g[d].q.push(arguments);};g[d].q=[];}g[d].l=(new Date()).getTime();var e=u.createElement(r);
-        e.src=i;e.async=true;var a=u.getElementsByTagName(r)[0];a.parentNode.insertBefore(e,a)
+        (function(g,u,r,i,d,e,a){
+            g.DimppleAnalyticsObject=d;
+            if(!(d in g)){
+                g[d]=function(){
+                    g[d].q.push(arguments);
+                };
+                g[d].q=[];
+            }
+            g[d].l=(new Date()).getTime();
+            var e=u.createElement(r);
+            e.src=i;
+            e.async=true;
+            // Adicionar listener para verificar carregamento
+            e.onload = function() {
+                console.log('Esta página está sendo traqueada pela Dimpple: https://dimpple.com');
+                window.dimppleLoaded = true;
+            };
+            e.onerror = function() {
+                console.warn('Falha ao carregar Dimpple Analytics');
+                window.dimppleLoaded = false;
+            };
+            var a=u.getElementsByTagName(r)[0];
+            a.parentNode.insertBefore(e,a);
         })(window,document,'script','//api.dimpple.com/public/js/analytics.js?trk=8045.0DAONQ.cbc9ffa6','trk');
+        
+        // Fallback para mobile - aguardar carregamento
+        window.addEventListener('load', function() {
+            // Aguardar 2 segundos para script carregar
+            setTimeout(function() {
+                if (!window.dimppleLoaded && !window.trk) {
+                    console.warn('⚠️ Dimple não carregou em 2s - tentando carregar novamente');
+                    // Tentar carregar novamente
+                    var script = document.createElement('script');
+                    script.src = 'https://api.dimpple.com/public/js/analytics.js?trk=8045.0DAONQ.cbc9ffa6';
+                    script.async = true;
+                    document.head.appendChild(script);
+                }
+            }, 2000);
+        });
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
