@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { AlertTriangle, Check, Star } from "lucide-react";
+import { Link } from "wouter";
 import EmergencyButton from "@/components/EmergencyButton";
 
 interface LandingPageProps {
@@ -109,6 +110,43 @@ export default function LandingPage({ onStart }: LandingPageProps) {
             </EmergencyButton>
           </motion.div>
         </motion.div>
+
+        {/* Footer */}
+        <motion.footer
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 1.2 }}
+          className="mt-16 text-center"
+        >
+          <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-6 text-white/70 text-sm">
+            <p className="text-white font-medium">© 2024 O Reino 360. Todos os direitos reservados.</p>
+            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
+              <Link 
+                href="/termos-de-uso" 
+                className="hover:text-white transition-colors duration-200"
+                data-testid="link-terms"
+              >
+                Termos de Uso
+              </Link>
+              <span className="hidden sm:inline text-white/40">•</span>
+              <Link 
+                href="/politica-de-privacidade" 
+                className="hover:text-white transition-colors duration-200"
+                data-testid="link-privacy"
+              >
+                Política de Privacidade
+              </Link>
+              <span className="hidden sm:inline text-white/40">•</span>
+              <Link 
+                href="/politica-de-reembolso" 
+                className="hover:text-white transition-colors duration-200"
+                data-testid="link-refund"
+              >
+                Política de Reembolso
+              </Link>
+            </div>
+          </div>
+        </motion.footer>
       </div>
     </div>
   );

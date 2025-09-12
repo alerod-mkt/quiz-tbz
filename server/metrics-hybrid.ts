@@ -19,6 +19,27 @@ interface FunilStats {
 
 // Flag para controlar se PostgreSQL está disponível
 let postgresAvailable = false;
+let connectionRetryCount = 0;
+const maxRetries = 3;
+let reconnectionTimer: NodeJS.Timeout | null = null;
+
+// Reconexão automática a cada 30 segundos se desconectado
+function startReconnectionTimer() {
+  if (reconnectionTimer) return; // Já há timer rodando
+  
+  reconnectionTimer = setInterval(async () => {
+    if (!postgresAvailable) {
+      console.log('🔄 Tentando reconectar ao PostgreSQL...');
+      await testPostgresConnection();
+    } else {
+      // Parar timer se conexão está OK
+      if (reconnectionTimer) {
+        clearInterval(reconnectionTimer);
+        reconnectionTimer = null;
+      }
+    }
+  }, 30000);
+}
 
 // Testar e garantir conexão com PostgreSQL
 async function testPostgresConnection() {
@@ -30,8 +51,9 @@ async function testPostgresConnection() {
         etapa TEXT NOT NULL,
         visitantes INTEGER DEFAULT 0,
         conversoes INTEGER DEFAULT 0,
-        tempo_total_segundos INTEGER DEFAULT 0,
-        data_atualizacao TIMESTAMP DEFAULT NOW() NOT NULL
+        taxa_conversao DECIMAL(5,2) DEFAULT 0,
+        tempo_medio_segundos INTEGER DEFAULT 0,
+        ultima_atualizacao TIMESTAMP DEFAULT NOW() NOT NULL
       )
     `);
     
@@ -44,6 +66,7 @@ async function testPostgresConnection() {
         quiz_completados INTEGER DEFAULT 0,
         vsl_visualizacoes INTEGER DEFAULT 0,
         sales_visualizacoes INTEGER DEFAULT 0,
+        adicionou_carrinho INTEGER DEFAULT 0,
         conversoes_compra INTEGER DEFAULT 0,
         taxa_conversao_geral DECIMAL(5,2) DEFAULT 0,
         tempo_medio_total INTEGER DEFAULT 0,
@@ -55,6 +78,16 @@ async function testPostgresConnection() {
         UNIQUE(data)
       )
     `);
+    
+    // Migração: adicionar coluna adicionou_carrinho se não existir
+    try {
+      await db.execute(sql`
+        ALTER TABLE metricas_diarias 
+        ADD COLUMN IF NOT EXISTS adicionou_carrinho INTEGER NOT NULL DEFAULT 0
+      `);
+    } catch (error) {
+      console.log('⚠️ Coluna adicionou_carrinho pode já existir:', error);
+    }
     
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS sessoes_anonimas (
@@ -83,6 +116,18 @@ async function testPostgresConnection() {
     console.log('❌ ERRO CRÍTICO: PostgreSQL não disponível');
     console.log('Erro:', error instanceof Error ? error.message : String(error));
     postgresAvailable = false;
+    connectionRetryCount++;
+    
+    // Iniciar timer de reconexão automática
+    startReconnectionTimer();
+    
+    console.log(`🔄 Tentativa de reconexão ${connectionRetryCount}/${maxRetries}`);
+    
+    // Retry automático imediato para as primeiras tentativas
+    if (connectionRetryCount <= maxRetries) {
+      setTimeout(() => testPostgresConnection(), 5000); // Retry em 5 segundos
+    }
+    
     throw new Error(`PostgreSQL connection failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
@@ -230,6 +275,7 @@ export class MetricsCollectorHybrid {
       console.log('❌ Erro PostgreSQL ao rastrear visitante');
       console.log('Erro:', error instanceof Error ? error.message : String(error));
       postgresAvailable = false;
+      startReconnectionTimer(); // Iniciar reconexão automática
       throw error;
     }
   }
@@ -290,6 +336,7 @@ export class MetricsCollectorHybrid {
       console.log('❌ Erro PostgreSQL ao rastrear conversão');
       console.log('Erro:', error instanceof Error ? error.message : String(error));
       postgresAvailable = false;
+      startReconnectionTimer(); // Iniciar reconexão automática
       throw error;
     }
   }
@@ -724,9 +771,9 @@ export class MetricsCollectorHybrid {
         console.log(`📊 Mostrando zeros para período ${periodo} (sem atividade)`);
       }
 
-      // Initiate Checkout = conversões da página de vendas (do período filtrado)
-      const initiateCheckouts = etapas['sales']?.conversoes || 0;
-      console.log(`📊 Calculando initiate_checkouts: sales conversoes = ${initiateCheckouts}`);
+      // Initiate Checkout = conversões de compra (checkout_iniciado), não conversões de sales
+      const initiateCheckouts = resumo_periodo.conversoes_compra || 0;
+      console.log(`📊 Calculando initiate_checkouts: conversoes_compra = ${initiateCheckouts}`);
       
 
       return {
@@ -918,6 +965,61 @@ export class MetricsCollectorHybrid {
       console.log('❌ Erro PostgreSQL ao rastrear checkout iniciado');
       console.log('Erro:', error instanceof Error ? error.message : String(error));
       postgresAvailable = false;
+      throw error;
+    }
+  }
+
+  // Rastrear quando adiciona ao carrinho (equivale à conversão da página de vendas)
+  static async trackAddToCart(sessionId: number): Promise<void> {
+    console.log(`🛒 trackAddToCart: sessionId=${sessionId}, postgresAvailable=${postgresAvailable}`);
+    
+    // Validar sessionId
+    if (!sessionId || sessionId === null || sessionId === undefined) {
+      console.error('❌ SessionId inválido para trackAddToCart:', sessionId);
+      throw new Error('SessionId inválido para trackAddToCart');
+    }
+    
+    // Tentar reconectar se necessário
+    if (!postgresAvailable) {
+      await testPostgresConnection();
+    }
+    
+    if (!postgresAvailable) {
+      throw new Error('PostgreSQL not available for add to cart tracking');
+    }
+
+    try {
+      // Atualizar sessão
+      await db
+        .update(sessoesAnonimas)
+        .set({
+          etapa_final: 'adicionou_carrinho',
+        })
+        .where(eq(sessoesAnonimas.session_id, sessionId));
+
+      console.log('✅ Sessão atualizada para adicionou_carrinho');
+
+      // Incrementar adicionou_carrinho nas métricas diárias
+      const hoje = this.getToday();
+      await this.incrementDailyMetric(hoje, 'adicionou_carrinho');
+      console.log('✅ Adicionou carrinho incrementado');
+      
+      // IMPORTANTE: Também incrementar conversões da página de vendas (funil)
+      // Pois conversão da página = adicionou carrinho (conforme solicitado)
+      try {
+        await this.trackConversion('sales', 'sales_conversion', '');
+        console.log('✅ Conversão da página de vendas incrementada no funil');
+      } catch (funnelError) {
+        console.log('⚠️ Erro ao incrementar conversão no funil:', funnelError);
+        // Não falhar a operação por causa disso
+      }
+      
+      console.log('✅ Add to cart e conversão página vendas registrados');
+    } catch (error) {
+      console.log('❌ Erro PostgreSQL ao rastrear add to cart');
+      console.log('Erro:', error instanceof Error ? error.message : String(error));
+      postgresAvailable = false;
+      startReconnectionTimer(); // Iniciar reconexão automática
       throw error;
     }
   }

@@ -48,6 +48,7 @@ export const metricasDiarias = pgTable("metricas_diarias", {
   quiz_completados: integer("quiz_completados").notNull().default(0),
   vsl_visualizacoes: integer("vsl_visualizacoes").notNull().default(0),
   sales_visualizacoes: integer("sales_visualizacoes").notNull().default(0),
+  adicionou_carrinho: integer("adicionou_carrinho").notNull().default(0),
   conversoes_compra: integer("conversoes_compra").notNull().default(0),
   taxa_conversao_geral: decimal("taxa_conversao_geral", { precision: 5, scale: 2 }).notNull().default("0"),
   tempo_medio_total: integer("tempo_medio_total").notNull().default(0),

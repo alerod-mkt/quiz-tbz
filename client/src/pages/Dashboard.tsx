@@ -179,6 +179,7 @@ export default function Dashboard() {
         urgencia_critica: 0,
         urgencia_alta: 0,
         urgencia_moderada: 0,
+        adicionou_carrinho: 0,
         taxa_conversao_geral: 0,
         horarios_atividade: {}
       };
@@ -196,6 +197,7 @@ export default function Dashboard() {
           visitantes_unicos: (acc.visitantes_unicos || 0) + (metricas.visitantes_unicos || 0),
           quiz_iniciados: (acc.quiz_iniciados || 0) + (metricas.quiz_iniciados || 0),
           quiz_completados: (acc.quiz_completados || 0) + (metricas.quiz_completados || 0),
+          adicionou_carrinho: (acc.adicionou_carrinho || 0) + (metricas.adicionou_carrinho || 0),
           conversoes_compra: (acc.conversoes_compra || 0) + (metricas.conversoes_compra || 0),
           urgencia_critica: (acc.urgencia_critica || 0) + (metricas.urgencia_critica || 0),
           urgencia_alta: (acc.urgencia_alta || 0) + (metricas.urgencia_alta || 0),
@@ -206,6 +208,7 @@ export default function Dashboard() {
           visitantes_unicos: 0,
           quiz_iniciados: 0,
           quiz_completados: 0,
+          adicionou_carrinho: 0,
           conversoes_compra: 0,
           urgencia_critica: 0,
           urgencia_alta: 0,
@@ -449,10 +452,10 @@ export default function Dashboard() {
         </motion.div>
 
         {/* Cards de Métricas Principais */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
           <MetricCard
             titulo="Total de Visitantes"
-            valor={resumoSeguro.visitantes_unicos}
+            valor={metrics?.funil.etapas['landing']?.visitantes || 0}
             icone={<Users className="w-8 h-8" />}
             cor="blue"
             data-testid="visitors-card"
@@ -475,9 +478,17 @@ export default function Dashboard() {
           />
           
           <MetricCard
+            titulo="Adicionou ao Carrinho"
+            valor={metricsFiltered?.funil?.etapas?.sales?.conversoes || 0}
+            icone={<ShoppingCart className="w-8 h-8" />}
+            cor="green"
+            data-testid="add-to-cart-card"
+          />
+          
+          <MetricCard
             titulo="Iniciou Checkout"
             valor={resumoSeguro.initiate_checkouts}
-            icone={<ShoppingCart className="w-8 h-8" />}
+            icone={<Target className="w-8 h-8" />}
             cor="indigo"
             data-testid="checkout-started-card"
           />

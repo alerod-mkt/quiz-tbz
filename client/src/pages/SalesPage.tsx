@@ -4,7 +4,7 @@ import { useState } from 'react';
 import CheckoutPopup from '@/components/CheckoutPopup';
 
 import { QuizAnswers } from "@/types/quiz";
-import { useTrackVisitor, trackAddToCart } from '@/hooks/use-metrics';
+import { useTrackVisitor, trackAddToCart, trackSalesConversion, useInitializeSession } from '@/hooks/use-metrics';
 
 // Declaração para Dimple Analytics
 declare global {
@@ -19,6 +19,9 @@ interface SalesPageProps {
 }
 
 export default function SalesPage({ quizAnswers }: SalesPageProps) {
+  // Inicializar sessão se ainda não foi inicializada
+  useInitializeSession();
+  
   // Rastrear visitante na página de vendas
   useTrackVisitor('sales');
   
@@ -42,9 +45,10 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
         console.error('❌ Erro no tracking Dimple:', dimpleError);
       }
       
-      // 1. Rastrear ADD TO CART
+      // Rastrear ADD TO CART (que também registra a conversão da página de vendas)
+      console.log('🛒 DEBUGGING: Iniciando trackAddToCart...');
       await trackAddToCart();
-      console.log('✅ ADD TO CART registrado');
+      console.log('✅ ADD TO CART registrado com sucesso');
       
       // 2. Abrir popup
       setIsPopupOpen(true);

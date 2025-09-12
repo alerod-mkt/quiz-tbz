@@ -4,6 +4,7 @@ import { X, Lock, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { trackCheckoutStarted } from '@/hooks/use-metrics';
 
 // Declaração para Dimple Analytics
 declare global {
@@ -41,6 +42,16 @@ export default function CheckoutPopup({ isOpen, onClose }: CheckoutPopupProps) {
         }
       } catch (dimpleError) {
         console.error('❌ Erro no tracking Dimple chk_29:', dimpleError);
+      }
+      
+      // Rastrear iniciou checkout 
+      try {
+        console.log('🛒 Rastreando iniciou checkout antes do redirect');
+        await trackCheckoutStarted();
+        console.log('✅ Iniciou checkout rastreado com sucesso');
+      } catch (checkoutError) {
+        console.error('❌ Erro ao rastrear iniciou checkout:', checkoutError);
+        // Continuar mesmo com erro no tracking
       }
       
       // Simular um pequeno delay para melhor UX

@@ -145,34 +145,15 @@ export const trackQuizCompleted = async (urgencia: string) => {
 
 // Função para rastrear início do checkout
 export const trackCheckoutStarted = async () => {
-  console.log('🛒 trackCheckoutStarted chamado:', { sessionId, sessionInitialized });
+  console.log('🛒 trackCheckoutStarted chamado - fazendo chamada direta');
   
-  const executeTrack = async () => {
-    if (sessionId) {
-      try {
-        // Registra conversão de sales -> checkout
-        await apiRequest('POST', '/api/metrics/conversion', { 
-          etapaOrigem: 'sales', 
-          etapaDestino: 'checkout_iniciado' 
-        });
-        console.log('✅ Conversão sales -> checkout rastreada');
-        
-        // Registra o checkout iniciado
-        await apiRequest('POST', '/api/metrics/checkout-started', { sessionId });
-        console.log('✅ Checkout iniciado rastreado com sucesso');
-      } catch (error) {
-        console.error('❌ Erro ao rastrear checkout iniciado:', error);
-      }
-    } else {
-      console.warn('⚠️ SessionId não disponível para trackCheckoutStarted');
-    }
-  };
-  
-  if (sessionInitialized) {
-    await executeTrack();
-  } else {
-    console.log('📝 Enfileirando trackCheckoutStarted até sessão estar pronta');
-    actionQueue.push(executeTrack);
+  try {
+    // Registra APENAS o checkout iniciado (sem vínculo com sales)
+    await apiRequest('POST', '/api/metrics/checkout-started', {});
+    console.log('✅ Checkout iniciado rastreado com sucesso');
+  } catch (error) {
+    console.error('❌ Erro ao rastrear checkout iniciado:', error);
+    throw error;
   }
 };
 
@@ -218,7 +199,23 @@ export const trackSalesConversion = async () => {
         console.error('❌ Erro ao rastrear conversão da página de vendas:', error);
       }
     } else {
-      console.warn('⚠️ SessionId não disponível para trackSalesConversion');
+      // Se não há sessionId, vamos tentar criar uma nova sessão
+      console.warn('⚠️ SessionId não disponível para trackSalesConversion - tentando inicializar nova sessão');
+      try {
+        const response = await apiRequest('POST', '/api/metrics/session') as unknown as { sessionId: number };
+        sessionId = response.sessionId;
+        sessionInitialized = true;
+        console.log('✅ Nova sessão criada para trackSalesConversion:', { sessionId });
+        
+        // Agora tenta fazer o tracking novamente
+        await apiRequest('POST', '/api/metrics/conversion', { 
+          etapaOrigem: 'sales', 
+          etapaDestino: 'sales_conversion' 
+        });
+        console.log('✅ Conversão da página de vendas (ADD TO CART) rastreada após criar nova sessão');
+      } catch (error) {
+        console.error('❌ Erro ao criar nova sessão ou rastrear conversão:', error);
+      }
     }
   };
   
@@ -230,8 +227,19 @@ export const trackSalesConversion = async () => {
   }
 };
 
-// Função específica para rastrear ADD TO CART (alias para trackSalesConversion)
-export const trackAddToCart = trackSalesConversion;
+// Função específica para rastrear ADD TO CART
+export const trackAddToCart = async () => {
+  console.log('🛒 trackAddToCart chamado - fazendo chamada direta');
+  
+  try {
+    // Faz chamada direta para add-to-cart (o backend vai usar sessionId da requisição)
+    const response = await apiRequest('POST', '/api/metrics/add-to-cart', {});
+    console.log('✅ Add to cart rastreado com sucesso');
+  } catch (error) {
+    console.error('❌ Erro ao rastrear add to cart:', error);
+    throw error;
+  }
+};
 
 // Hook para rastrear tempo em uma página
 export const useTrackTime = (etapa: string) => {

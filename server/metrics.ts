@@ -26,6 +26,7 @@ interface MetricasDiarias {
     quiz_completados: number;
     vsl_visualizacoes: number;
     sales_visualizacoes: number;
+    adicionou_carrinho: number;
     conversoes_compra: number;
     taxa_conversao_geral: number;
     tempo_medio_total: number;
@@ -200,6 +201,7 @@ async function initDailyMetrics(date: string): Promise<void> {
       quiz_completados: 0,
       vsl_visualizacoes: 0,
       sales_visualizacoes: 0,
+      adicionou_carrinho: 0,
       conversoes_compra: 0,
       taxa_conversao_geral: 0,
       tempo_medio_total: 0,
@@ -390,6 +392,26 @@ export class MetricsCollector {
     }
     
     await saveJsonFile('metricas_diarias.json', metricas);
+  }
+  
+  // Registrar quando adiciona ao carrinho
+  static async trackAddToCart(sessionId: number): Promise<void> {
+    const today = getToday();
+    await initDailyMetrics(today);
+    
+    // Atualizar métricas diárias com verificação de integridade
+    const metricas = await loadJsonFile<MetricasDiarias>('metricas_diarias.json', {});
+    
+    // Garantir incremento seguro
+    const carrinhoAnterior = metricas[today].adicionou_carrinho || 0;
+    metricas[today].adicionou_carrinho = Math.max(carrinhoAnterior + 1, carrinhoAnterior);
+    
+    await saveJsonFile('metricas_diarias.json', metricas);
+    
+    // Atualizar sessão
+    await this.updateSession(sessionId, {
+      etapa_final: 'adicionou_carrinho'
+    });
   }
   
   // Registrar início do checkout

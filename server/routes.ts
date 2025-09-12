@@ -144,9 +144,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/metrics/add-to-cart", async (req, res) => {
+    try {
+      let { sessionId } = req.body;
+      
+      // Se não há sessionId, criar uma nova sessão
+      if (!sessionId) {
+        console.log('🛒 SessionId não fornecido para add-to-cart, criando nova sessão');
+        sessionId = await MetricsCollectorHybrid.startSession();
+        console.log(`🛒 Nova sessão criada: ${sessionId}`);
+      }
+      
+      console.log(`🛒 Tracking add to cart: session ${sessionId}`);
+      await MetricsCollectorHybrid.trackAddToCart(sessionId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error tracking add to cart:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.post("/api/metrics/checkout-started", async (req, res) => {
     try {
-      const { sessionId } = req.body;
+      let { sessionId } = req.body;
+      
+      // Se não há sessionId, criar uma nova sessão
+      if (!sessionId) {
+        console.log('🛒 SessionId não fornecido para checkout-started, criando nova sessão');
+        sessionId = await MetricsCollectorHybrid.startSession();
+        console.log(`🛒 Nova sessão criada: ${sessionId}`);
+      }
+      
       console.log(`🛒 Tracking checkout started: session ${sessionId}`);
       await MetricsCollectorHybrid.trackPurchase(sessionId);
       res.json({ success: true });

@@ -4,7 +4,11 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import QuizFlow from "@/pages/QuizFlow";
+import SalesPage from "@/pages/SalesPage";
 import Dashboard from "@/pages/Dashboard";
+import TermosDeUso from "@/pages/TermosDeUso";
+import PoliticaDePrivacidade from "@/pages/PoliticaDePrivacidade";
+import PoliticaDeReembolso from "@/pages/PoliticaDeReembolso";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -12,7 +16,11 @@ function Router() {
     <Switch>
       <Route path="/" component={QuizFlow} />
       <Route path="/quiz" component={QuizFlow} />
+      <Route path="/sales">{() => <SalesPage />}</Route>
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/termos-de-uso" component={TermosDeUso} />
+      <Route path="/politica-de-privacidade" component={PoliticaDePrivacidade} />
+      <Route path="/politica-de-reembolso" component={PoliticaDeReembolso} />
       <Route component={NotFound} />
     </Switch>
   );
