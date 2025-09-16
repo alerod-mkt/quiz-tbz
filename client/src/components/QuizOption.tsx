@@ -1,6 +1,5 @@
-import { motion } from "framer-motion";
 import { Check } from "lucide-react";
-import { memo, useMemo } from "react";
+import { memo, useMemo, useEffect, useState } from "react";
 
 interface QuizOptionProps {
   option: string;
@@ -10,38 +9,46 @@ interface QuizOptionProps {
 }
 
 const QuizOption = memo<QuizOptionProps>(({ option, isSelected, onClick, delay = 0 }) => {
-  // Memoize computed values to avoid recalculation
-  const animationConfig = useMemo(() => ({
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.5, delay }
-  }), [delay]);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Use CSS animation with staggered delays for better performance
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, delay * 100); // Reduced from 1000 to 100 for faster animation
+    
+    return () => clearTimeout(timer);
+  }, [delay]);
 
   const checkboxClassName = useMemo(() => 
-    `w-6 h-6 border-2 border-primary rounded-full mr-4 flex-shrink-0 flex items-center justify-center ${
+    `w-5 sm:w-6 h-5 sm:h-6 border-2 border-primary rounded-full mr-3 sm:mr-4 flex-shrink-0 flex items-center justify-center transition-colors duration-200 ${
       isSelected ? 'bg-primary' : ''
     }`, [isSelected]);
 
   const containerClassName = useMemo(() => 
-    `quiz-option bg-white p-6 rounded-lg shadow-md cursor-pointer ${
-      isSelected ? 'border-primary' : ''
-    }`, [isSelected]);
+    `quiz-option bg-white p-4 sm:p-5 md:p-6 rounded-lg shadow-md cursor-pointer transition-all duration-200
+    hover:scale-[1.02] active:scale-[0.98] min-h-[44px] flex items-center
+    ${isSelected ? 'border-primary border-2' : 'border border-gray-200'} 
+    ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`, [isSelected, isVisible]);
+
   return (
-    <motion.div
-      {...animationConfig}
+    <div
       className={containerClassName}
       onClick={onClick}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
       data-testid="quiz-option"
+      style={{ 
+        transitionDelay: isVisible ? '0ms' : `${delay * 50}ms`, // Faster stagger
+        transitionDuration: '300ms', // Shorter transition
+        transitionProperty: 'opacity, transform'
+      }}
     >
-      <div className="flex items-center">
+      <div className="flex items-center w-full">
         <div className={checkboxClassName}>
-          {isSelected && <Check className="w-4 h-4 text-white" />}
+          {isSelected && <Check className="w-3 sm:w-4 h-3 sm:h-4 text-white" />}
         </div>
-        <span className="text-foreground font-medium">{option}</span>
+        <span className="text-sm sm:text-base text-foreground font-medium leading-relaxed">{option}</span>
       </div>
-    </motion.div>
+    </div>
   );
 });
 

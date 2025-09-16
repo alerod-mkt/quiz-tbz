@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 
 interface EmergencyButtonProps {
@@ -24,25 +23,25 @@ export default function EmergencyButton({
 }: EmergencyButtonProps) {
   const sizeClasses = size === "large" 
     ? "py-6 px-8 text-xl" 
-    : "py-4 px-8 text-lg";
+    : "py-3 sm:py-4 px-6 sm:px-8 text-base sm:text-lg min-h-[44px]";
 
   return (
-    <motion.button
+    <button
       type={type}
       onClick={onClick}
       disabled={disabled}
       id={id}
       className={`emergency-btn w-full text-white font-bold rounded-lg ${sizeClasses} ${
         isPulse ? 'pulse-urgent' : ''
-      } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-      whileHover={disabled ? {} : { scale: 1.02 }}
-      whileTap={disabled ? {} : { scale: 0.98 }}
+      } ${disabled ? 'opacity-50 cursor-not-allowed' : ''} 
+      transition-transform duration-150 ease-out 
+      ${disabled ? '' : 'hover:scale-[1.02] active:scale-[0.98]'}`}
       data-testid={dataTestId}
     >
       <div className="flex items-center justify-center">
         <Heart className="mr-3" />
         {children}
       </div>
-    </motion.button>
+    </button>
   );
 }

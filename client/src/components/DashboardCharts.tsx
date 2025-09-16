@@ -1,28 +1,51 @@
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  LineElement,
-  PointElement,
-} from 'chart.js';
-import { Bar, Doughnut, Line } from 'react-chartjs-2';
+import { Suspense, lazy } from 'react';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  LineElement,
-  PointElement,
+// Loading component for charts
+const ChartLoading = () => (
+  <div className="flex items-center justify-center h-64 bg-gray-50 animate-pulse rounded-lg">
+    <div className="text-gray-500">Carregando gráfico...</div>
+  </div>
 );
+
+// Lazy load Chart.js components to reduce initial bundle size
+const LazyBarChart = lazy(async () => {
+  const [chartModule, reactChartModule] = await Promise.all([
+    import('chart.js'),
+    import('react-chartjs-2')
+  ]);
+  
+  const { Chart, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } = chartModule;
+  const { Bar } = reactChartModule;
+  
+  Chart.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+  return { default: Bar };
+});
+
+const LazyDoughnutChart = lazy(async () => {
+  const [chartModule, reactChartModule] = await Promise.all([
+    import('chart.js'),
+    import('react-chartjs-2')
+  ]);
+  
+  const { Chart, ArcElement, Title, Tooltip, Legend } = chartModule;
+  const { Doughnut } = reactChartModule;
+  
+  Chart.register(ArcElement, Title, Tooltip, Legend);
+  return { default: Doughnut };
+});
+
+const LazyLineChart = lazy(async () => {
+  const [chartModule, reactChartModule] = await Promise.all([
+    import('chart.js'),
+    import('react-chartjs-2')
+  ]);
+  
+  const { Chart, CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend } = chartModule;
+  const { Line } = reactChartModule;
+  
+  Chart.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
+  return { default: Line };
+});
 
 interface FunilData {
   etapas: { [key: string]: {
@@ -110,7 +133,11 @@ export function FunilChart({ funilData }: { funilData: FunilData }) {
     },
   };
 
-  return <Bar data={chartData} options={options} />;
+  return (
+    <Suspense fallback={<ChartLoading />}>
+      <LazyBarChart data={chartData} options={options} />
+    </Suspense>
+  );
 }
 
 // Gráfico de Pizza para Distribuição de Urgência
@@ -176,7 +203,11 @@ export function UrgenciaChart({
     },
   };
 
-  return <Doughnut data={chartData} options={options} />;
+  return (
+    <Suspense fallback={<ChartLoading />}>
+      <LazyDoughnutChart data={chartData} options={options} />
+    </Suspense>
+  );
 }
 
 // Gráfico de Linha Temporal para Métricas por Dia
@@ -242,7 +273,11 @@ export function TimelineChart({ metricasDiarias }: { metricasDiarias: MetricasDi
     },
   };
 
-  return <Line data={chartData} options={options} />;
+  return (
+    <Suspense fallback={<ChartLoading />}>
+      <LazyLineChart data={chartData} options={options} />
+    </Suspense>
+  );
 }
 
 // Heatmap de Horários de Atividade
@@ -426,5 +461,9 @@ export function AbandonoChart({ funilData }: { funilData: FunilData }) {
     },
   };
 
-  return <Bar data={chartData} options={options} />;
+  return (
+    <Suspense fallback={<ChartLoading />}>
+      <LazyBarChart data={chartData} options={options} />
+    </Suspense>
+  );
 }

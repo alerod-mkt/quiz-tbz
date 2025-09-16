@@ -160,16 +160,16 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
   ];
 
   return (
-    <div className="min-h-screen py-8 px-4 pt-20">
+    <div className="min-h-screen py-4 sm:py-6 lg:py-8 px-3 sm:px-4 pt-16 sm:pt-20">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-8 fade-in"
+          className="text-center mb-6 sm:mb-8 fade-in"
         >
-          <h1 className="text-3xl md:text-5xl font-black text-white leading-tight mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight mb-3 sm:mb-4 px-2 sm:px-0">
             SEU DIAGNÓSTICO<br />
             <span className="text-yellow-400">ESTÁ PRONTO</span>
           </h1>
@@ -180,20 +180,20 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="bg-gradient-to-r from-red-600 to-red-700 text-white rounded-2xl p-6 md:p-8 shadow-2xl mb-8 fade-in border border-red-500"
+          className="bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl mb-6 sm:mb-8 fade-in border border-red-500"
           data-testid="diagnostic-result"
         >
           <div className="text-center">
-            <div className="flex items-center justify-center mb-4">
-              <TrendingUp className="w-8 h-8 mr-3" />
-              <h3 className="text-2xl md:text-3xl font-black">
+            <div className="flex flex-col sm:flex-row items-center justify-center mb-3 sm:mb-4">
+              <TrendingUp className="w-6 sm:w-8 h-6 sm:h-8 mb-2 sm:mb-0 sm:mr-3" />
+              <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black leading-tight">
                 📊 RESULTADO: Padrão de Conflito Crítico Identificado
               </h3>
             </div>
-            <div className="bg-white/15 backdrop-blur rounded-xl p-4 mb-4 border border-white/20">
-              <p className="text-xl font-bold text-yellow-300">{diagnosticResult}</p>
+            <div className="bg-white/15 backdrop-blur rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 border border-white/20">
+              <p className="text-lg sm:text-xl font-bold text-yellow-300">{diagnosticResult}</p>
             </div>
-            <p className="text-lg leading-relaxed mb-4">
+            <p className="text-sm sm:text-base md:text-lg leading-relaxed mb-3 sm:mb-4">
               Baseado nas suas respostas, identifiquei que você está presa no que chamamos de <strong>"Ciclo da Briga Automática"</strong> - um padrão destrutivo onde pequenos desentendimentos se transformam em explosões emocionais que deixam cicatrizes profundas na família.
             </p>
           </div>
@@ -204,31 +204,31 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in mb-8"
+          className="maternal-warmth rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-12 shadow-2xl fade-in mb-6 sm:mb-8"
         >
-          <div className="text-center mb-8">
-            <h3 className="text-2xl md:text-3xl font-black text-primary mb-4 flex items-center justify-center">
-              <Eye className="mr-3 w-8 h-8" />
+          <div className="text-center mb-6 sm:mb-8">
+            <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black text-primary mb-3 sm:mb-4 flex flex-col sm:flex-row items-center justify-center leading-tight">
+              <Eye className="mb-2 sm:mb-0 sm:mr-3 w-6 sm:w-8 h-6 sm:h-8" />
               O QUE AS SUAS RESPOSTAS REVELARAM:
             </h3>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {revelacoes.map((item, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
-                className="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-xl"
+                className="bg-red-50 border-l-4 border-red-500 p-4 sm:p-6 rounded-r-xl"
               >
                 <div className="flex items-start">
-                  <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
-                    <item.icon className="text-white w-5 h-5" />
+                  <div className="w-8 sm:w-10 h-8 sm:h-10 bg-red-500 rounded-full flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0">
+                    <item.icon className="text-white w-4 sm:w-5 h-4 sm:h-5" />
                   </div>
                   <div>
-                    <h4 className="font-black text-red-800 text-lg mb-2">{index + 1}. {item.titulo}</h4>
-                    <p className="text-red-700 leading-relaxed">{item.descricao}</p>
+                    <h4 className="font-black text-red-800 text-base sm:text-lg mb-1 sm:mb-2">{index + 1}. {item.titulo}</h4>
+                    <p className="text-red-700 leading-relaxed text-sm sm:text-base">{item.descricao}</p>
                   </div>
                 </div>
               </motion.div>
@@ -241,33 +241,33 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in mb-8"
+          className="maternal-warmth rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-12 shadow-2xl fade-in mb-6 sm:mb-8"
         >
-          <div className="text-center mb-8">
-            <h3 className="text-2xl md:text-3xl font-black text-primary mb-4 flex items-center justify-center">
+          <div className="text-center mb-6 sm:mb-8">
+            <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black text-primary mb-3 sm:mb-4 leading-tight">
               🎯 O QUE PRECISA SER FEITO URGENTEMENTE:
             </h3>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {fases.map((fase, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
-                className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 p-6 rounded-xl"
+                className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 p-4 sm:p-6 rounded-xl"
               >
-                <div className="flex items-center mb-3">
-                  <div className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold mr-4">
+                <div className="flex flex-col sm:flex-row sm:items-center mb-3 space-y-2 sm:space-y-0">
+                  <div className="bg-blue-500 text-white px-3 py-1 rounded-full text-xs sm:text-sm font-bold mr-0 sm:mr-4">
                     {fase.fase}
                   </div>
-                  <h4 className="font-black text-blue-800 text-lg">{fase.titulo}</h4>
-                  <span className="ml-auto bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">
+                  <h4 className="font-black text-blue-800 text-base sm:text-lg">{fase.titulo}</h4>
+                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs sm:text-sm font-bold sm:ml-auto">
                     {fase.prazo}
                   </span>
                 </div>
-                <p className="text-blue-700 leading-relaxed">{fase.descricao}</p>
+                <p className="text-blue-700 leading-relaxed text-sm sm:text-base">{fase.descricao}</p>
               </motion.div>
             ))}
           </div>
@@ -278,13 +278,13 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.7 }}
-          className="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-2xl p-8 md:p-12 shadow-2xl fade-in mb-8"
+          className="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-12 shadow-2xl fade-in mb-6 sm:mb-8"
         >
-          <div className="text-center mb-6">
-            <h3 className="text-2xl md:text-3xl font-black mb-4 flex items-center justify-center">
+          <div className="text-center mb-4 sm:mb-6">
+            <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black mb-3 sm:mb-4 leading-tight">
               💡 A SOLUÇÃO ESTÁ AQUI:
             </h3>
-            <p className="text-lg leading-relaxed opacity-95">
+            <p className="text-sm sm:text-base md:text-lg leading-relaxed opacity-95">
               Eu tenho uma solução comprovada que já ajudou mais de <strong>1.400 casais</strong> a saírem exatamente dessa situação em que você está. É um método que desenvolvi especificamente para resolver esse problema em <strong className="text-yellow-300">apenas 7 dias</strong>, de forma prática e sem complicações.
             </p>
           </div>
@@ -295,17 +295,17 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.9 }}
-          className="maternal-warmth rounded-2xl p-8 md:p-12 shadow-2xl fade-in mb-8"
+          className="maternal-warmth rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-12 shadow-2xl fade-in mb-6 sm:mb-8"
         >
-          <div className="text-center mb-10">
-            <h3 className="text-3xl md:text-4xl font-black text-primary mb-4">
+          <div className="text-center mb-8 sm:mb-10">
+            <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-primary mb-3 sm:mb-4">
               ✨ CONHEÇA O "TRUQUE DA BRIGA ZERO"
             </h3>
-            <p className="text-xl text-muted-foreground font-bold">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground font-bold">
               O Método Que Elimina Brigas e Restaura a Paz Familiar em 7 Dias
             </p>
-            <div className="bg-yellow-100 border border-yellow-300 rounded-xl p-4 mt-6">
-              <p className="text-lg text-yellow-800 leading-relaxed">
+            <div className="bg-yellow-100 border border-yellow-300 rounded-xl p-3 sm:p-4 mt-4 sm:mt-6">
+              <p className="text-sm sm:text-base md:text-lg text-yellow-800 leading-relaxed">
                 Depois de acompanhar seu diagnóstico, posso afirmar com certeza: <strong>você consegue resolver isso rapidamente</strong> se seguir o sistema certo.
               </p>
             </div>
@@ -369,36 +369,36 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 1.7 }}
-            className="bg-gradient-to-r from-yellow-400 to-orange-400 text-black rounded-xl p-8 mb-8 text-center border-4 border-red-500"
+            className="bg-gradient-to-r from-yellow-400 to-orange-400 text-black rounded-xl p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 text-center border-4 border-red-500"
             data-testid="pricing-section"
           >
-            <h3 className="text-2xl font-bold mb-4 flex items-center justify-center">
-              <span className="text-4xl mr-2">💰</span>
+            <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4 flex flex-col sm:flex-row items-center justify-center">
+              <span className="text-2xl sm:text-3xl md:text-4xl mb-1 sm:mb-0 sm:mr-2">💰</span>
               INVESTIMENTO ESPECIAL:
             </h3>
             
-            <div className="bg-white/90 backdrop-blur rounded-xl p-6 mb-4">
-              <div className="flex items-center justify-center mb-4">
-                <div className="text-gray-500 text-xl line-through mr-4">De R$ 197,00</div>
-                <div className="text-5xl font-black text-red-600">R$ 29,90</div>
+            <div className="bg-white/90 backdrop-blur rounded-xl p-4 sm:p-6 mb-4">
+              <div className="flex flex-col sm:flex-row items-center justify-center mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+                <div className="text-gray-500 text-base sm:text-lg md:text-xl line-through sm:mr-4">De R$ 197,00</div>
+                <div className="text-3xl sm:text-4xl md:text-5xl font-black text-red-600">R$ 29,90</div>
               </div>
-              <p className="text-lg text-gray-700 font-bold">
+              <p className="text-sm sm:text-base md:text-lg text-gray-700 font-bold">
                 Por que esse preço? Porque eu sei como é difícil viver em um lar sem paz. E sei que você já gastou muito mais tentando resolver isso de outras formas.
               </p>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-4 mt-6 mb-6">
-              <div className="flex items-center justify-center bg-white/80 rounded-lg p-3">
-                <Zap className="text-green-600 mr-2 w-5 h-5" />
-                <span className="font-bold text-sm">⚡ ACESSO IMEDIATO</span>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-4 sm:mt-6 mb-4 sm:mb-6">
+              <div className="flex items-center justify-center bg-white/80 rounded-lg p-2 sm:p-3">
+                <Zap className="text-green-600 mr-2 w-4 sm:w-5 h-4 sm:h-5" />
+                <span className="font-bold text-xs sm:text-sm">⚡ ACESSO IMEDIATO</span>
               </div>
-              <div className="flex items-center justify-center bg-white/80 rounded-lg p-3">
-                <Shield className="text-blue-600 mr-2 w-5 h-5" />
-                <span className="font-bold text-sm">💳 Parcele em 12x</span>
+              <div className="flex items-center justify-center bg-white/80 rounded-lg p-2 sm:p-3">
+                <Shield className="text-blue-600 mr-2 w-4 sm:w-5 h-4 sm:h-5" />
+                <span className="font-bold text-xs sm:text-sm">💳 Parcele em 12x</span>
               </div>
-              <div className="flex items-center justify-center bg-white/80 rounded-lg p-3">
-                <Users className="text-purple-600 mr-2 w-5 h-5" />
-                <span className="font-bold text-sm">📱 Todos dispositivos</span>
+              <div className="flex items-center justify-center bg-white/80 rounded-lg p-2 sm:p-3">
+                <Users className="text-purple-600 mr-2 w-4 sm:w-5 h-4 sm:h-5" />
+                <span className="font-bold text-xs sm:text-sm">📱 Todos dispositivos</span>
               </div>
             </div>
             
@@ -420,7 +420,7 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
                 id="oferta_29"
                 data-dimple-id="oferta_29"
                 data-testid="price-section-button"
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-green-600 hover:bg-green-700 text-white h-14 px-8 py-4 text-lg font-bold animate-pulse shadow-2xl transform hover:scale-105 transition-all duration-300"
+                className="inline-flex items-center justify-center rounded-md text-xs sm:text-sm md:text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-green-600 hover:bg-green-700 text-white min-h-[44px] h-12 sm:h-14 px-4 sm:px-6 md:px-8 py-3 sm:py-4 font-bold animate-pulse shadow-2xl transform hover:scale-105 transition-all duration-300 w-full sm:w-auto"
               >
                 🛒 QUERO SALVAR MEUS FILHOS AGORA - R$ 29,90
               </button>
@@ -531,10 +531,10 @@ export default function SalesPage({ quizAnswers }: SalesPageProps) {
                   console.error('❌ Erro touch tracking:', error);
                 }
               }}
-              id="oferta_29"
-              data-dimple-id="oferta_29"
+              id="oferta_29_final"
+              data-dimple-id="oferta_29_final"
               data-testid="checkout-button"
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-green-600 hover:bg-green-700 text-white h-14 px-8 py-4 text-lg font-bold animate-pulse shadow-2xl transform hover:scale-105 transition-all duration-300 w-full"
+              className="inline-flex items-center justify-center rounded-md text-xs sm:text-sm md:text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-green-600 hover:bg-green-700 text-white min-h-[44px] h-12 sm:h-14 px-4 sm:px-6 md:px-8 py-3 sm:py-4 font-bold animate-pulse shadow-2xl transform hover:scale-105 transition-all duration-300 w-full"
             >
               🛒 QUERO SALVAR MEUS FILHOS AGORA - R$ 29,90
             </button>

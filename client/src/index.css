@@ -115,11 +115,74 @@
   }
 
   .fade-in {
-    animation: fadeIn 0.8s ease-in-out;
+    animation: fadeIn 0.4s ease-out; /* Faster animation */
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(10px); } /* Reduced movement */
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Mobile performance optimizations */
+  button, [role="button"], .clickable {
+    touch-action: manipulation;
+    min-height: 44px; /* WCAG AA touch target minimum */
+  }
+
+  /* Mobile-specific optimizations */
+  @media (max-width: 768px) {
+    /* Improve font rendering on mobile */
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    /* Better scroll behavior on specific containers */
+    .modal, .popup, .scroll-container {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    /* Improve input experience */
+    input, textarea {
+      font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    /* Better focus states for mobile */
+    button:focus-visible, 
+    a:focus-visible, 
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible {
+      outline: 3px solid var(--ring);
+      outline-offset: 2px;
+    }
+
+    /* Prevent text selection on interactive UI elements */
+    button, .quiz-option, .quiz-nav {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+    }
+  }
+
+  /* Landscape mobile orientation */
+  @media (max-width: 768px) and (orientation: landscape) {
+    /* Reduce padding in landscape mode for better space utilization */
+    .container, .max-w-7xl, .max-w-6xl {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+
+  /* Respect user motion preferences for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

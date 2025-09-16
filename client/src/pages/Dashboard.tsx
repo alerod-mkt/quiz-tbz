@@ -255,18 +255,18 @@ export default function Dashboard() {
             />
           </div>
           
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">Painel do Quiz</h1>
+          <div className="flex flex-col">
+            <div className="text-center md:text-left mb-4">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Painel do Quiz</h1>
               <p className="text-gray-600">Métricas e Analytics - TBZ</p>
             </div>
             
-            <div className="flex flex-wrap gap-3 mt-4 md:mt-0">
-              {/* Filtro de Data */}
+            {/* Filtros de Data - Linha Separada */}
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3 mb-4">
               <select
                 value={filtroData}
                 onChange={(e) => setFiltroData(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                 data-testid="date-filter"
               >
                 <option value="hoje">Hoje</option>
@@ -288,7 +288,7 @@ export default function Dashboard() {
                       setTimeout(() => refetch(), 100);
                     }
                   }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                   data-testid="specific-date-input"
                 />
               )}
@@ -306,7 +306,7 @@ export default function Dashboard() {
                         setTimeout(() => refetch(), 100);
                       }
                     }}
-                    className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                     placeholder="Data Início"
                     data-testid="start-date-input"
                   />
@@ -320,64 +320,67 @@ export default function Dashboard() {
                         setTimeout(() => refetch(), 100);
                       }
                     }}
-                    className="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                     placeholder="Data Fim"
                     data-testid="end-date-input"
                   />
                 </>
               )}
+            </div>
 
+            {/* Botões de Ação - Linha Separada */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3">
               <button
                 onClick={() => refetch()}
                 disabled={isLoading}
-                className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                className="flex items-center justify-center px-2 sm:px-3 md:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 text-xs sm:text-sm min-h-[44px]"
                 data-testid="refresh-button"
               >
-                <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                Atualizar
+                <RefreshCw className={`w-3 sm:w-4 h-3 sm:h-4 sm:mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">Atualizar</span>
               </button>
               
               <button
                 onClick={() => setShowExportModal(true)}
-                className="flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                className="flex items-center justify-center px-2 sm:px-3 md:px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-xs sm:text-sm min-h-[44px]"
                 data-testid="export-button"
               >
-                <Download className="w-4 h-4 mr-2" />
-                Exportar
+                <Download className="w-3 sm:w-4 h-3 sm:h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Exportar</span>
               </button>
               
               <button
                 onClick={() => setShowRemoveIpModal(true)}
-                className="flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors"
+                className="flex items-center justify-center px-2 sm:px-3 md:px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors text-xs sm:text-sm min-h-[44px]"
                 data-testid="remove-ip-button"
               >
-                <Users className="w-4 h-4 mr-2" />
-                Remover IP
+                <Users className="w-3 sm:w-4 h-3 sm:h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Remover IP</span>
               </button>
 
               <button
                 onClick={() => setShowResetHorariosConfirm(true)}
-                className="flex items-center px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors"
+                className="flex items-center justify-center px-2 sm:px-3 md:px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors text-xs sm:text-sm min-h-[44px]"
                 data-testid="reset-horarios-button"
               >
-                <Clock className="w-4 h-4 mr-2" />
-                Zerar Horários
+                <Clock className="w-3 sm:w-4 h-3 sm:h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Zerar Horários</span>
               </button>
 
               <button
                 onClick={() => setShowResetConfirm(true)}
-                className="flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                className="flex items-center justify-center px-2 sm:px-3 md:px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-xs sm:text-sm min-h-[44px]"
                 data-testid="reset-button"
               >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Zerar Leads
+                <RotateCcw className="w-3 sm:w-4 h-3 sm:h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Zerar Leads</span>
               </button>
             </div>
           </div>
         </motion.div>
 
         {/* Cards de Métricas Principais */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 mb-6">
           <MetricCard
             titulo="Total de Visitantes"
             valor={resumoSeguro.visitantes_unicos}
@@ -549,16 +552,16 @@ export default function Dashboard() {
         </motion.div>
 
         {/* Gráficos Principais */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
           {/* Funil de Conversão */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-white rounded-xl shadow-lg p-6"
+            className="bg-white rounded-xl shadow-lg p-4 sm:p-6"
           >
-            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-              <BarChart2 className="w-6 h-6 mr-2" />
+            <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center">
+              <BarChart2 className="w-5 sm:w-6 h-5 sm:h-6 mr-2" />
               Gráfico do Funil
             </h2>
             {metricsFiltered?.funil && <FunilChart funilData={metricsFiltered.funil} />}
@@ -569,10 +572,10 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="bg-white rounded-xl shadow-lg p-6"
+            className="bg-white rounded-xl shadow-lg p-4 sm:p-6"
           >
-            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-              <PieChart className="w-6 h-6 mr-2" />
+            <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center">
+              <PieChart className="w-5 sm:w-6 h-5 sm:h-6 mr-2" />
               Distribuição de Urgência
             </h2>
             <UrgenciaChart 
@@ -584,13 +587,13 @@ export default function Dashboard() {
         </div>
 
         {/* Timeline e Abandono */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6">
           {/* Linha Temporal */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="bg-white rounded-xl shadow-lg p-6"
+            className="bg-white rounded-xl shadow-lg p-4 sm:p-6"
           >
             <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
               <TrendingUp className="w-6 h-6 mr-2" />
