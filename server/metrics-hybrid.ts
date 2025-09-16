@@ -1,6 +1,7 @@
 import { db } from './db';
 import { funilMetricas, metricasDiarias, sessoesAnonimas, ipControlTable } from '@shared/schema';
-import { eq, sql, and, gte } from 'drizzle-orm';
+import { eq, sql, and, gte, lte } from 'drizzle-orm';
+import { shouldCountVisit, TrackingDecision } from './tracking-utils';
 
 // Sistema exclusivo PostgreSQL - sem fallback JSON
 
@@ -104,9 +105,41 @@ async function testPostgresConnection() {
         hora_acesso INTEGER NOT NULL,
         data_acesso TEXT NOT NULL,
         ip_address TEXT DEFAULT '',
+        is_bot BOOLEAN DEFAULT FALSE,
+        country TEXT DEFAULT '',
+        city TEXT DEFAULT '',
+        country_code TEXT DEFAULT '',
+        user_agent TEXT DEFAULT '',
         criado_em TIMESTAMP DEFAULT NOW() NOT NULL
       )
     `);
+
+    // Adicionar novas colunas se não existirem (migração)
+    try {
+      await db.execute(sql`
+        ALTER TABLE sessoes_anonimas 
+        ADD COLUMN IF NOT EXISTS is_bot BOOLEAN DEFAULT FALSE
+      `);
+      await db.execute(sql`
+        ALTER TABLE sessoes_anonimas 
+        ADD COLUMN IF NOT EXISTS country TEXT DEFAULT ''
+      `);
+      await db.execute(sql`
+        ALTER TABLE sessoes_anonimas 
+        ADD COLUMN IF NOT EXISTS city TEXT DEFAULT ''
+      `);
+      await db.execute(sql`
+        ALTER TABLE sessoes_anonimas 
+        ADD COLUMN IF NOT EXISTS country_code TEXT DEFAULT ''
+      `);
+      await db.execute(sql`
+        ALTER TABLE sessoes_anonimas 
+        ADD COLUMN IF NOT EXISTS user_agent TEXT DEFAULT ''
+      `);
+      console.log('✅ Novas colunas de geolocalização e bot detection adicionadas!');
+    } catch (error) {
+      console.log('⚠️ Colunas podem já existir:', error);
+    }
 
     await db.select().from(funilMetricas).limit(1);
     postgresAvailable = true;
@@ -200,13 +233,39 @@ export class MetricsCollectorHybrid {
   }
 
   // Rastrear visitante em uma etapa específica
-  static async trackVisitor(etapa: string, ipAddress?: string): Promise<void> {
+  static async trackVisitor(etapa: string, ipAddress?: string, userAgent?: string): Promise<void> {
     if (!postgresAvailable) {
       throw new Error('PostgreSQL not available for visitor tracking');
     }
     
     try {
-      // Verificar deduplicação se IP foi fornecido
+      // 1. NOVA LÓGICA: Verificar se devemos contar a visita (bot detection + geolocalização)
+      if (ipAddress && userAgent) {
+        const trackingDecision = await shouldCountVisit(ipAddress, userAgent);
+        
+        console.log(`🔍 Análise da visita:`, {
+          ip: ipAddress,
+          etapa,
+          shouldCount: trackingDecision.should_count,
+          isBot: trackingDecision.is_bot,
+          location: trackingDecision.location,
+          reason: trackingDecision.reason
+        });
+        
+        // Se não deve contar, não incrementar métricas mas ainda pode registrar IP
+        if (!trackingDecision.should_count) {
+          console.log(`⚠️ Visita ignorada: ${trackingDecision.reason}`);
+          
+          // Ainda registrar IP para deduplicação
+          if (ipAddress) {
+            await this.registerIPAction(ipAddress, etapa);
+          }
+          
+          return;
+        }
+      }
+      
+      // 2. Verificar deduplicação se IP foi fornecido
       if (ipAddress) {
         const isDuplicate = await this.checkIPDeduplication(ipAddress, etapa);
         if (isDuplicate) {
@@ -281,7 +340,7 @@ export class MetricsCollectorHybrid {
   }
 
   // Rastrear conversão entre etapas
-  static async trackConversion(etapaOrigem?: string, etapaDestino?: string, ipAddress?: string): Promise<void> {
+  static async trackConversion(etapaOrigem?: string, etapaDestino?: string, ipAddress?: string, userAgent?: string): Promise<void> {
     if (!postgresAvailable) {
       throw new Error('PostgreSQL not available for conversion tracking');
     }
@@ -289,7 +348,33 @@ export class MetricsCollectorHybrid {
     try {
       if (!etapaOrigem) return;
 
-      // Verificar deduplicação por IP para conversões
+      // 1. NOVA LÓGICA: Verificar se devemos contar a conversão (bot detection + geolocalização)
+      if (ipAddress && userAgent) {
+        const trackingDecision = await shouldCountVisit(ipAddress, userAgent);
+        
+        console.log(`🔍 Análise da conversão:`, {
+          ip: ipAddress,
+          conversao: `${etapaOrigem} -> ${etapaDestino}`,
+          shouldCount: trackingDecision.should_count,
+          isBot: trackingDecision.is_bot,
+          location: trackingDecision.location,
+          reason: trackingDecision.reason
+        });
+        
+        // Se não deve contar, não incrementar conversões mas ainda registrar IP para deduplicação
+        if (!trackingDecision.should_count) {
+          console.log(`⚠️ Conversão ignorada: ${trackingDecision.reason}`);
+          
+          // Ainda registrar IP para deduplicação
+          if (ipAddress) {
+            await this.registerIPAction(ipAddress, `conversion_${etapaOrigem}_${etapaDestino}`);
+          }
+          
+          return;
+        }
+      }
+
+      // 2. Verificar deduplicação por IP para conversões
       if (ipAddress) {
         const isDuplicate = await this.checkIPDeduplication(ipAddress, `conversion_${etapaOrigem}_${etapaDestino}`);
         if (isDuplicate) {
@@ -342,13 +427,26 @@ export class MetricsCollectorHybrid {
   }
 
   // Iniciar nova sessão
-  static async startSession(ipAddress?: string): Promise<number> {
+  static async startSession(ipAddress?: string, userAgent?: string): Promise<number> {
     if (!postgresAvailable) {
       throw new Error('PostgreSQL not available for session tracking');
     }
     
     try {
-      // Verificar se IP já iniciou sessão nas últimas 24h
+      // 1. NOVA LÓGICA: Analisar se devemos contar a visita
+      let trackingDecision: TrackingDecision | null = null;
+      if (ipAddress && userAgent) {
+        trackingDecision = await shouldCountVisit(ipAddress, userAgent);
+        console.log(`🔍 Análise de nova sessão:`, {
+          ip: ipAddress,
+          shouldCount: trackingDecision.should_count,
+          isBot: trackingDecision.is_bot,
+          location: trackingDecision.location,
+          reason: trackingDecision.reason
+        });
+      }
+      
+      // 2. Verificar se IP já iniciou sessão nas últimas 24h
       let shouldIncrementVisitor = true;
       if (ipAddress) {
         const isDuplicate = await this.checkIPDeduplication(ipAddress, 'session_start');
@@ -357,12 +455,19 @@ export class MetricsCollectorHybrid {
           shouldIncrementVisitor = false;
         }
       }
+      
+      // 3. Se é bot ou fora do Brasil, não incrementa visitantes únicos
+      if (trackingDecision && !trackingDecision.should_count) {
+        shouldIncrementVisitor = false;
+        console.log(`⚠️ Sessão não contará nos totais: ${trackingDecision.reason}`);
+      }
 
-      // Gerar ID único baseado em timestamp para evitar duplicatas
+      // 4. Gerar ID único baseado em timestamp para evitar duplicatas
       const sessionId = Date.now() % 100000;
       const hoje = this.getToday();
       const horaAtual = this.getCurrentHour();
 
+      // 5. Inserir sessão com dados de geolocalização e bot detection
       await db.insert(sessoesAnonimas).values({
         session_id: sessionId,
         etapa_inicial: 'landing',
@@ -375,6 +480,11 @@ export class MetricsCollectorHybrid {
         hora_acesso: horaAtual,
         data_acesso: hoje,
         ip_address: ipAddress || '',
+        is_bot: trackingDecision?.is_bot || false,
+        country: trackingDecision?.location?.country || '',
+        city: trackingDecision?.location?.city || '',
+        country_code: trackingDecision?.location?.country_code || '',
+        user_agent: userAgent || '',
       });
 
       // Incrementar visitante único apenas quando nova sessão é criada E IP não visitou antes
@@ -646,8 +756,63 @@ export class MetricsCollectorHybrid {
         metricasDiariasObj[item.data] = item;
       });
 
-      // Buscar sessões
-      const sessoes = await db.select().from(sessoesAnonimas);
+      // Buscar sessões (filtrar por período se necessário)
+      let sessoes;
+      if (periodo === 'data_especifica' && dataEspecifica) {
+        // Filtrar sessões pela data específica
+        const startOfDay = new Date(dataEspecifica + 'T00:00:00.000Z');
+        const endOfDay = new Date(dataEspecifica + 'T23:59:59.999Z');
+        sessoes = await db.select().from(sessoesAnonimas)
+          .where(and(
+            gte(sessoesAnonimas.criado_em, startOfDay),
+            lte(sessoesAnonimas.criado_em, endOfDay)
+          ));
+      } else if (periodo === 'ontem') {
+        // Filtrar sessões de ontem
+        const now = new Date();
+        const saoPauloOffset = -3 * 60; // UTC-3
+        const saoPauloTime = new Date(now.getTime() + (saoPauloOffset * 60 * 1000));
+        const ontem = new Date(saoPauloTime.getTime() - 24 * 60 * 60 * 1000);
+        const startOfDay = new Date(ontem);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(ontem);
+        endOfDay.setHours(23, 59, 59, 999);
+        
+        sessoes = await db.select().from(sessoesAnonimas)
+          .where(and(
+            gte(sessoesAnonimas.criado_em, startOfDay),
+            lte(sessoesAnonimas.criado_em, endOfDay)
+          ));
+      } else if (periodo === 'faixa_data' && dataInicio && dataFim) {
+        // Filtrar sessões pela faixa de datas
+        const startOfPeriod = new Date(dataInicio + 'T00:00:00.000Z');
+        const endOfPeriod = new Date(dataFim + 'T23:59:59.999Z');
+        sessoes = await db.select().from(sessoesAnonimas)
+          .where(and(
+            gte(sessoesAnonimas.criado_em, startOfPeriod),
+            lte(sessoesAnonimas.criado_em, endOfPeriod)
+          ));
+      } else if (periodo === 'semana') {
+        // Filtrar sessões dos últimos 7 dias
+        const now = new Date();
+        const saoPauloOffset = -3 * 60;
+        const hoje = new Date(now.getTime() + (saoPauloOffset * 60 * 1000));
+        const seteDiasAtras = new Date(hoje.getTime() - (7 * 24 * 60 * 60 * 1000));
+        seteDiasAtras.setHours(0, 0, 0, 0);
+        
+        sessoes = await db.select().from(sessoesAnonimas)
+          .where(gte(sessoesAnonimas.criado_em, seteDiasAtras));
+      } else {
+        // Para "hoje" ou padrão, filtrar apenas hoje
+        const hoje = this.getToday();
+        const startOfDay = new Date(hoje + 'T00:00:00.000Z');
+        const endOfDay = new Date(hoje + 'T23:59:59.999Z');
+        sessoes = await db.select().from(sessoesAnonimas)
+          .where(and(
+            gte(sessoesAnonimas.criado_em, startOfDay),
+            lte(sessoesAnonimas.criado_em, endOfDay)
+          ));
+      }
 
       // Determinar data de referência baseado no filtro
       let dataReferencia: string;
@@ -743,8 +908,8 @@ export class MetricsCollectorHybrid {
         resumo_periodo = metricasDiariasObj[hoje] || resumo_periodo;
       }
 
-      // Estratégia inteligente: usar dados do funil base (que tem granularidade) 
-      // quando há atividade no período, zeros quando não há
+      // Estratégia correta: para períodos específicos (data_especifica, ontem, etc), 
+      // mostrar dados filtrados ou zeros se não há dados para esse período
       let etapas: { [key: string]: MetricasEtapa } = {};
       
       const temDadosNoPeriodo = resumo_periodo.visitantes_unicos > 0 || 
@@ -752,23 +917,29 @@ export class MetricsCollectorHybrid {
                                resumo_periodo.quiz_completados > 0;
       
       
-      if (temDadosNoPeriodo) {
-        // Se há dados no período, usar dados acumulados do funil (etapasBase)
-        // porque contém dados granulares das perguntas individuais e conversões detalhadas
-        etapas = { ...etapasBase };
-        console.log(`📊 Usando dados acumulados do funil pois há atividade no período ${periodo}`);
+      // Decidir se usar dados acumulados ou calcular funil do período
+      if (periodo === 'hoje' || periodo === 'semana') {
+        // Para "hoje" e "semana", usar dados acumulados (comportamento atual)
+        if (temDadosNoPeriodo) {
+          etapas = { ...etapasBase };
+          console.log(`📊 Usando dados acumulados do funil para período ${periodo} (há atividade)`);
+        } else {
+          // Mostrar zeros se não há atividade
+          Object.keys(etapasBase).forEach(etapa => {
+            etapas[etapa] = {
+              nome: etapa,
+              visitantes: 0,
+              conversoes: 0,
+              taxa_conversao: 0,
+              tempo_medio_segundos: 0
+            };
+          });
+          console.log(`📊 Mostrando zeros para funil do período ${periodo} (sem atividade)`);
+        }
       } else {
-        // Se não há dados no período, mostrar todas as etapas como zero
-        Object.keys(etapasBase).forEach(etapa => {
-          etapas[etapa] = {
-            nome: etapa,
-            visitantes: 0,
-            conversoes: 0,
-            taxa_conversao: 0,
-            tempo_medio_segundos: 0
-          };
-        });
-        console.log(`📊 Mostrando zeros para período ${periodo} (sem atividade)`);
+        // Para períodos específicos (ontem, data_especifica, faixa_data), calcular funil baseado nas sessões do período
+        etapas = this.calcularEtapasPorSessoes(sessoes, etapasBase);
+        console.log(`📊 Calculando funil baseado em ${sessoes.length} sessões do período ${periodo}`);
       }
 
       // Initiate Checkout = conversões de compra (checkout_iniciado), não conversões de sales
@@ -776,12 +947,60 @@ export class MetricsCollectorHybrid {
       console.log(`📊 Calculando initiate_checkouts: conversoes_compra = ${initiateCheckouts}`);
       
 
+      // Filtrar métricas diárias baseado no período selecionado
+      let metricasDiariasFiltradas: any = {};
+      
+      if (periodo === 'data_especifica' && dataEspecifica) {
+        // Apenas a data específica
+        if (metricasDiariasObj[dataEspecifica]) {
+          metricasDiariasFiltradas[dataEspecifica] = metricasDiariasObj[dataEspecifica];
+        }
+        console.log(`📊 Filtrando métricas diárias para data específica: ${dataEspecifica}`);
+      } else if (periodo === 'ontem') {
+        // Apenas ontem
+        if (metricasDiariasObj[dataReferencia]) {
+          metricasDiariasFiltradas[dataReferencia] = metricasDiariasObj[dataReferencia];
+        }
+        console.log(`📊 Filtrando métricas diárias para ontem: ${dataReferencia}`);
+      } else if (periodo === 'semana') {
+        // Últimos 7 dias
+        const now = new Date();
+        const saoPauloOffset = -3 * 60;
+        const hoje = new Date(now.getTime() + (saoPauloOffset * 60 * 1000));
+        for (let i = 0; i < 7; i++) {
+          const data = new Date(hoje.getTime() - (i * 24 * 60 * 60 * 1000));
+          const dataStr = data.toISOString().split('T')[0];
+          if (metricasDiariasObj[dataStr]) {
+            metricasDiariasFiltradas[dataStr] = metricasDiariasObj[dataStr];
+          }
+        }
+        console.log(`📊 Filtrando métricas diárias para últimos 7 dias`);
+      } else if (periodo === 'faixa_data' && dataInicio && dataFim) {
+        // Faixa de datas
+        const dataInicioDate = new Date(dataInicio);
+        const dataFimDate = new Date(dataFim);
+        for (let d = new Date(dataInicioDate); d <= dataFimDate; d.setDate(d.getDate() + 1)) {
+          const dataStr = d.toISOString().split('T')[0];
+          if (metricasDiariasObj[dataStr]) {
+            metricasDiariasFiltradas[dataStr] = metricasDiariasObj[dataStr];
+          }
+        }
+        console.log(`📊 Filtrando métricas diárias para faixa: ${dataInicio} a ${dataFim}`);
+      } else {
+        // Hoje (padrão) - apenas hoje
+        const hoje = this.getToday();
+        if (metricasDiariasObj[hoje]) {
+          metricasDiariasFiltradas[hoje] = metricasDiariasObj[hoje];
+        }
+        console.log(`📊 Filtrando métricas diárias para hoje: ${hoje}`);
+      }
+
       return {
         funil: {
           etapas,
           ultima_atualizacao: new Date().toISOString(),
         },
-        metricas_diarias: metricasDiariasObj,
+        metricas_diarias: metricasDiariasFiltradas,
         sessoes,
         resumo_hoje: {
           ...resumo_periodo,
@@ -815,6 +1034,7 @@ export class MetricsCollectorHybrid {
       throw error;
     }
   }
+
 
   // Resetar apenas os horários de atividade
   static async resetHorariosAtividade(): Promise<void> {

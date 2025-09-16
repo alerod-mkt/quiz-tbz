@@ -75,6 +75,11 @@ export const sessoesAnonimas = pgTable("sessoes_anonimas", {
   hora_acesso: integer("hora_acesso").notNull(),
   data_acesso: text("data_acesso").notNull(),
   ip_address: text("ip_address").notNull().default(''),
+  is_bot: boolean("is_bot").notNull().default(false),
+  country: text("country").notNull().default(''),
+  city: text("city").notNull().default(''),
+  country_code: text("country_code").notNull().default(''),
+  user_agent: text("user_agent").notNull().default(''),
   criado_em: timestamp("criado_em").defaultNow().notNull(),
 });
 

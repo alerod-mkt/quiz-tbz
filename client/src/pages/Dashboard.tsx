@@ -154,86 +154,9 @@ export default function Dashboard() {
     }
   };
 
+  // Não precisamos mais desta função no frontend, pois o backend já faz a filtragem correta
   const filtrarMetricasPorData = (filtro: string) => {
-    if (!metrics) return metrics;
-
-    // Usar fuso horário de São Paulo (UTC-3)
-    const now = new Date();
-    const saoPauloOffset = -3 * 60; // UTC-3 em minutos
-    const saoPauloTime = new Date(now.getTime() + (saoPauloOffset * 60 * 1000));
-    
-    const hoje = saoPauloTime.toISOString().split('T')[0];
-    const ontem = new Date(saoPauloTime.getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    const seteDiasAtras = new Date(saoPauloTime.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
-    // Aplicar filtros de data tanto aos cards quanto ao funil para consistência
-    let metricasFiltradas = { ...metrics };
-
-    if (filtro === 'ontem') {
-      // Mostrar métricas de ontem
-      const resumoOntem = metrics.metricas_diarias[ontem] || {
-        visitantes_unicos: 0,
-        quiz_iniciados: 0,
-        quiz_completados: 0,
-        conversoes_compra: 0,
-        urgencia_critica: 0,
-        urgencia_alta: 0,
-        urgencia_moderada: 0,
-        adicionou_carrinho: 0,
-        taxa_conversao_geral: 0,
-        horarios_atividade: {}
-      };
-      metricasFiltradas.resumo_hoje = resumoOntem;
-      
-      // Filtrar funil para mostrar apenas dados de ontem (se houver)
-      metricasFiltradas.funil = {
-        etapas: {} // Funil vazio para ontem, já que métricas históricas por etapa não são armazenadas por data
-      };
-    } else if (filtro === 'semana') {
-      // Agregar dados da última semana
-      const metricasSemana = Object.entries(metrics.metricas_diarias)
-        .filter(([data]) => data >= seteDiasAtras && data <= hoje)
-        .reduce((acc, [_, metricas]: [string, any]) => ({
-          visitantes_unicos: (acc.visitantes_unicos || 0) + (metricas.visitantes_unicos || 0),
-          quiz_iniciados: (acc.quiz_iniciados || 0) + (metricas.quiz_iniciados || 0),
-          quiz_completados: (acc.quiz_completados || 0) + (metricas.quiz_completados || 0),
-          adicionou_carrinho: (acc.adicionou_carrinho || 0) + (metricas.adicionou_carrinho || 0),
-          conversoes_compra: (acc.conversoes_compra || 0) + (metricas.conversoes_compra || 0),
-          urgencia_critica: (acc.urgencia_critica || 0) + (metricas.urgencia_critica || 0),
-          urgencia_alta: (acc.urgencia_alta || 0) + (metricas.urgencia_alta || 0),
-          urgencia_moderada: (acc.urgencia_moderada || 0) + (metricas.urgencia_moderada || 0),
-          taxa_conversao_geral: 0, // Será recalculado
-          horarios_atividade: {}
-        }), {
-          visitantes_unicos: 0,
-          quiz_iniciados: 0,
-          quiz_completados: 0,
-          adicionou_carrinho: 0,
-          conversoes_compra: 0,
-          urgencia_critica: 0,
-          urgencia_alta: 0,
-          urgencia_moderada: 0,
-          taxa_conversao_geral: 0,
-          horarios_atividade: {}
-        });
-      
-      metricasSemana.taxa_conversao_geral = metricasSemana.visitantes_unicos > 0 
-        ? (metricasSemana.quiz_completados / metricasSemana.visitantes_unicos) * 100 
-        : 0;
-      
-      metricasFiltradas.resumo_hoje = metricasSemana;
-      
-      // Para semana, manter o funil atual já que representa dados acumulados recentes
-      // No futuro, funil deveria ser filtrado por período quando backend suportar
-    } else if (filtro !== 'hoje') {
-      // Para outros filtros (data específica, faixa), zerar funil até implementarmos filtro por período no backend
-      metricasFiltradas.funil = {
-        etapas: {}
-      };
-    }
-    // Para 'hoje' não precisa fazer nada, usar os dados originais
-
-    return metricasFiltradas;
+    return metrics; // Backend já retorna dados filtrados
   };
 
   const metricsFiltered = filtrarMetricasPorData(filtroData);
@@ -289,6 +212,7 @@ export default function Dashboard() {
     urgencia_critica: 0,
     urgencia_alta: 0,
     urgencia_moderada: 0,
+    adicionou_carrinho: 0,
     horarios_atividade: {}
   };
 
@@ -302,6 +226,7 @@ export default function Dashboard() {
     urgencia_critica: resumoHoje.urgencia_critica || 0,
     urgencia_alta: resumoHoje.urgencia_alta || 0,
     urgencia_moderada: resumoHoje.urgencia_moderada || 0,
+    adicionou_carrinho: (resumoHoje as any).adicionou_carrinho || 0,
     horarios_atividade: resumoHoje.horarios_atividade || {},
     initiate_checkouts: (resumoHoje as any).initiate_checkouts || 0
   };
@@ -455,7 +380,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
           <MetricCard
             titulo="Total de Visitantes"
-            valor={metrics?.funil.etapas['landing']?.visitantes || 0}
+            valor={resumoSeguro.visitantes_unicos}
             icone={<Users className="w-8 h-8" />}
             cor="blue"
             data-testid="visitors-card"
@@ -479,7 +404,7 @@ export default function Dashboard() {
           
           <MetricCard
             titulo="Adicionou ao Carrinho"
-            valor={metricsFiltered?.funil?.etapas?.sales?.conversoes || 0}
+            valor={(resumoSeguro as any).adicionou_carrinho || 0}
             icone={<ShoppingCart className="w-8 h-8" />}
             cor="green"
             data-testid="add-to-cart-card"
@@ -517,7 +442,7 @@ export default function Dashboard() {
           <div className="space-y-4">
             {/* Página Inicial */}
             {(() => {
-              const data = metrics?.funil.etapas['landing'] || {
+              const data = metricsFiltered?.funil.etapas['landing'] || {
                 visitantes: 0,
                 conversoes: 0,
                 taxa_conversao: 0
@@ -536,7 +461,7 @@ export default function Dashboard() {
             
             {/* Iniciou o Quiz */}
             {(() => {
-              const data = metrics?.funil.etapas['quiz_inicio'] || {
+              const data = metricsFiltered?.funil.etapas['quiz_inicio'] || {
                 visitantes: 0,
                 conversoes: 0,
                 taxa_conversao: 0
@@ -576,21 +501,21 @@ export default function Dashboard() {
               </div>
               
               {/* Mostrar métricas da pergunta selecionada */}
-              {metrics?.funil.etapas[`quiz_pergunta_${selectedQuestion}`] && (
+              {metricsFiltered?.funil.etapas[`quiz_pergunta_${selectedQuestion}`] && (
                 <div>
                   <p className="text-sm text-gray-600 mb-2">
                     {QUIZ_QUESTIONS.find(q => q.id === selectedQuestion)?.question}
                   </p>
                   <FunilEtapa
                     etapa={`Pergunta ${selectedQuestion}`}
-                    visitantes={metrics.funil.etapas[`quiz_pergunta_${selectedQuestion}`].visitantes}
-                    conversoes={metrics.funil.etapas[`quiz_pergunta_${selectedQuestion}`].conversoes}
-                    taxa={metrics.funil.etapas[`quiz_pergunta_${selectedQuestion}`].taxa_conversao}
+                    visitantes={metricsFiltered.funil.etapas[`quiz_pergunta_${selectedQuestion}`].visitantes}
+                    conversoes={metricsFiltered.funil.etapas[`quiz_pergunta_${selectedQuestion}`].conversoes}
+                    taxa={metricsFiltered.funil.etapas[`quiz_pergunta_${selectedQuestion}`].taxa_conversao}
                   />
                 </div>
               )}
               
-              {!metrics?.funil.etapas[`quiz_pergunta_${selectedQuestion}`] && (
+              {!metricsFiltered?.funil.etapas[`quiz_pergunta_${selectedQuestion}`] && (
                 <p className="text-gray-500 text-sm">Nenhum dado disponível para esta pergunta ainda.</p>
               )}
             </div>
@@ -603,7 +528,7 @@ export default function Dashboard() {
               ];
               
               return etapasFinais.map(({ key, nome }) => {
-                const data = metrics?.funil.etapas[key] || {
+                const data = metricsFiltered?.funil.etapas[key] || {
                   visitantes: 0,
                   conversoes: 0,
                   taxa_conversao: 0
@@ -636,7 +561,7 @@ export default function Dashboard() {
               <BarChart2 className="w-6 h-6 mr-2" />
               Gráfico do Funil
             </h2>
-            {metrics?.funil && <FunilChart funilData={metrics.funil} />}
+            {metricsFiltered?.funil && <FunilChart funilData={metricsFiltered.funil} />}
           </motion.div>
 
           {/* Distribuição de Urgência */}
@@ -671,7 +596,7 @@ export default function Dashboard() {
               <TrendingUp className="w-6 h-6 mr-2" />
               Métricas Temporais
             </h2>
-            {metrics?.metricas_diarias && <TimelineChart metricasDiarias={metrics.metricas_diarias} />}
+            {metricsFiltered?.metricas_diarias && <TimelineChart metricasDiarias={metricsFiltered.metricas_diarias} />}
           </motion.div>
 
           {/* Taxa de Abandono */}
@@ -685,7 +610,7 @@ export default function Dashboard() {
               <TrendingDown className="w-6 h-6 mr-2" />
               Abandono do Funil
             </h2>
-            {metrics?.funil && <AbandonoChart funilData={metrics.funil} />}
+            {metricsFiltered?.funil && <AbandonoChart funilData={metricsFiltered.funil} />}
           </motion.div>
         </div>
 
@@ -755,6 +680,7 @@ export default function Dashboard() {
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-2">ID</th>
                   <th className="text-left py-2">IP</th>
+                  <th className="text-left py-2">País/Cidade</th>
                   <th className="text-left py-2">Etapa Final</th>
                   <th className="text-left py-2">Completou</th>
                   <th className="text-left py-2">Urgência</th>
@@ -762,33 +688,51 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {metrics?.sessoes.slice(-10).reverse().map((sessao) => (
-                  <tr key={sessao.id} className="border-b border-gray-100">
-                    <td className="py-2">#{(sessao as any).session_id || sessao.id}</td>
-                    <td className="py-2 text-xs font-mono">{(sessao as any).ip_address || 'N/A'}</td>
-                    <td className="py-2">{sessao.etapa_final}</td>
-                    <td className="py-2">
-                      <span className={`px-2 py-1 rounded text-xs ${
-                        sessao.completou ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {sessao.completou ? 'Sim' : 'Não'}
-                      </span>
-                    </td>
-                    <td className="py-2">
-                      {sessao.resultado_urgencia && (
+                {metrics?.sessoes.slice(-10).reverse().map((sessao) => {
+                  const sessionData = sessao as any;
+                  const isBot = sessionData.is_bot;
+                  const country = sessionData.country || '';
+                  const city = sessionData.city || '';
+                  const locationText = country && city ? `${country}, ${city}` : (country || city || 'N/A');
+                  
+                  return (
+                    <tr key={sessao.id} className="border-b border-gray-100">
+                      <td className="py-2">#{sessionData.session_id || sessao.id}</td>
+                      <td className="py-2 text-xs font-mono">{sessionData.ip_address || 'N/A'}</td>
+                      <td className="py-2 text-xs">
+                        <div className="flex items-center gap-1">
+                          {locationText}
+                          {isBot && (
+                            <span className="px-1 py-0.5 bg-red-100 text-red-600 text-xs rounded" title="Bot detectado">
+                              🤖
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-2">{sessao.etapa_final}</td>
+                      <td className="py-2">
                         <span className={`px-2 py-1 rounded text-xs ${
-                          sessao.resultado_urgencia === 'HIGH_URGENCY' ? 'bg-red-100 text-red-800' :
-                          sessao.resultado_urgencia === 'MEDIUM_URGENCY' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-green-100 text-green-800'
+                          sessao.completou ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                         }`}>
-                          {sessao.resultado_urgencia === 'HIGH_URGENCY' ? 'Crítica' :
-                           sessao.resultado_urgencia === 'MEDIUM_URGENCY' ? 'Alta' : 'Moderada'}
+                          {sessao.completou ? 'Sim' : 'Não'}
                         </span>
-                      )}
-                    </td>
-                    <td className="py-2">{sessao.data_acesso}</td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="py-2">
+                        {sessao.resultado_urgencia && (
+                          <span className={`px-2 py-1 rounded text-xs ${
+                            sessao.resultado_urgencia === 'HIGH_URGENCY' ? 'bg-red-100 text-red-800' :
+                            sessao.resultado_urgencia === 'MEDIUM_URGENCY' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-green-100 text-green-800'
+                          }`}>
+                            {sessao.resultado_urgencia === 'HIGH_URGENCY' ? 'Crítica' :
+                             sessao.resultado_urgencia === 'MEDIUM_URGENCY' ? 'Alta' : 'Moderada'}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2">{sessao.data_acesso}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

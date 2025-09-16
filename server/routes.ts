@@ -72,9 +72,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
                        req.socket.remoteAddress || 
                        'unknown';
       
-      console.log(`🌐 IP capturado: ${ipAddress}`);
+      // Capturar User-Agent
+      const userAgent = req.headers['user-agent'] || '';
       
-      await MetricsCollectorHybrid.trackVisitor(etapa, String(ipAddress));
+      console.log(`🌐 IP capturado: ${ipAddress}`);
+      console.log(`🤖 User-Agent capturado: ${userAgent}`);
+      
+      await MetricsCollectorHybrid.trackVisitor(etapa, String(ipAddress), String(userAgent));
       res.json({ success: true });
     } catch (error) {
       console.error("Error tracking visitor:", error);
@@ -91,7 +95,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                        req.socket.remoteAddress || 
                        'unknown';
       
-      const sessionId = await MetricsCollectorHybrid.startSession(String(ipAddress));
+      // Capturar User-Agent
+      const userAgent = req.headers['user-agent'] || '';
+      
+      const sessionId = await MetricsCollectorHybrid.startSession(String(ipAddress), String(userAgent));
       res.json({ success: true, sessionId });
     } catch (error) {
       console.error("Error starting session:", error);
@@ -124,7 +131,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
                        req.socket.remoteAddress || 
                        'unknown';
       
-      await MetricsCollectorHybrid.trackConversion(etapaOrigem, etapaDestino, String(ipAddress));
+      // Capturar User-Agent
+      const userAgent = req.headers['user-agent'] || '';
+      
+      console.log(`🌐 IP capturado para conversão: ${ipAddress}`);
+      console.log(`🤖 User-Agent capturado para conversão: ${userAgent}`);
+      
+      await MetricsCollectorHybrid.trackConversion(etapaOrigem, etapaDestino, String(ipAddress), String(userAgent));
       res.json({ success: true });
     } catch (error) {
       console.error("Error tracking conversion:", error);

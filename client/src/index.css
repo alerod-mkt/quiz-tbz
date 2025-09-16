@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+/* Font loaded in HTML head for better performance */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

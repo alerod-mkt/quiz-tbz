@@ -1,8 +1,38 @@
 import express, { type Request, Response, NextFunction } from "express";
+import compression from "compression";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+
+// Apply aggressive cache headers for static assets (before serveStatic)
+app.use((req, res, next) => {
+  // Only apply to assets with typical static file extensions
+  if (req.url.match(/\.(js|css|woff2?|ttf|eot|svg|png|jpg|jpeg|gif|webp|ico)$/)) {
+    // Aggressive caching for hashed assets (Vite generates with 8+ char hash)
+    if (req.url.match(/\.[a-f0-9]{8,}\.(js|css)$/)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else {
+      res.setHeader('Cache-Control', 'public, max-age=86400'); // 1 day for other static assets
+    }
+  }
+  next();
+});
+
+// Enable gzip compression for all dynamic responses (major performance boost)
+app.use(compression({
+  level: 6, // Good balance between compression ratio and speed
+  threshold: 1024, // Only compress responses above 1KB
+  filter: (req: Request, res: Response) => {
+    // Don't compress already compressed files
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    // Use compression default filter for everything else
+    return compression.filter(req, res);
+  }
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
