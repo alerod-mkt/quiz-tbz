@@ -16,38 +16,47 @@ jobs:
     - name: 🔑 Setup SSH
       uses: webfactory/ssh-agent@v0.9.0
       with:
-        ssh-private-key: ${{ secrets.SSH_KEY }}
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     
-    - name: 📋 Copy docker-compose to server
+    - name: 🧪 Test SSH Connection
       run: |
-        scp -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} \
-          docker-compose.yml \
-          ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/quiz-tbz-compose.yml
+        ssh -o StrictHostKeyChecking=no -p 22 \
+          ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} \
+          "echo '✅ SSH connection successful!' && whoami"
     
-    - name: 🚀 Deploy to Docker Swarm
+    - name: 🚀 Force Service Update (Restart with Fresh Code)
       run: |
-        ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} \
-          ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+        ssh -o StrictHostKeyChecking=no -p 22 \
+          ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+          set -e
           
-          # Deploy da stack
-          docker stack deploy -c /tmp/quiz-tbz-compose.yml quiz_tbz --with-registry-auth
+          echo "🔍 Verificando serviço atual..."
+          docker service ls | grep quiz_tbz || {
+            echo "❌ Serviço quiz_tbz não encontrado!"
+            exit 1
+          }
           
-          # Aguardar o deploy
-          echo "⏳ Aguardando serviços ficarem prontos..."
-          sleep 10
+          echo "🔄 Forçando atualização do serviço (restart)..."
+          docker service update --force quiz_tbz_quiz_tbz
           
-          # Verificar status
-          docker service ls | grep quiz_tbz
+          echo "⏳ Aguardando serviço estabilizar (30s)..."
+          sleep 30
           
-          # Limpar arquivo temporário
-          rm /tmp/quiz-tbz-compose.yml
+          echo "📊 Status final do serviço:"
+          docker service ps quiz_tbz_quiz_tbz --no-trunc | head -n 5
           
-          echo "✅ Deploy concluído com sucesso!"
+          echo "✅ Deploy concluído! O container vai puxar o código mais recente do GitHub."
         EOF
     
-    - name: 📊 Verificar status do deploy
+    - name: 📊 Verificar Logs do Serviço
       if: success()
       run: |
-        ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} \
-          ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-          "docker service ps quiz_tbz_quiz_tbz --no-trunc"
+        ssh -o StrictHostKeyChecking=no -p 22 \
+          ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} \
+          "docker service logs quiz_tbz_quiz_tbz --tail 50"
+    
+    - name: ✅ Deploy Summary
+      if: success()
+      run: |
+        echo "🎉 Deploy realizado com sucesso!"
+        echo "🌐 Aplicação disponível em: https://quiztbz.oreino360.com"
