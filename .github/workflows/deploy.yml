@@ -52,7 +52,7 @@ jobs:
       if: success()
       run: |
         ssh -o StrictHostKeyChecking=no -p 22 \
-          ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} \
+          ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
           "docker service logs quiz_tbz_quiz_tbz --tail 50"
     
     - name: ✅ Deploy Summary
