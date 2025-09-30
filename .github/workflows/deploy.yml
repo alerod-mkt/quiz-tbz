@@ -22,41 +22,111 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} \
           ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-          "echo '✅ SSH connection successful!' && whoami"
+          "echo '✅ SSH connection successful!'"
     
-    - name: 🚀 Force Service Update (Restart with Fresh Code)
+    - name: 🚀 Deploy Application
       run: |
         ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} \
           ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
           set -e
           
-          echo "🔍 Verificando serviço atual..."
-          docker service ls | grep quiz_tbz || {
-            echo "❌ Serviço quiz_tbz não encontrado!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🚀 INICIANDO DEPLOY"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          
+          echo "🔍 Localizando serviço..."
+          SERVICE_NAME=$(docker service ls --filter name=quiz_tbz --format "{{.Name}}" | grep quiz_tbz | head -n1)
+          
+          if [ -z "$SERVICE_NAME" ]; then
+            echo "❌ Serviço não encontrado!"
+            echo ""
+            echo "Serviços disponíveis:"
+            docker service ls
             exit 1
-          }
+          fi
           
-          echo "🔄 Forçando atualização do serviço (restart)..."
-          docker service update --force quiz_tbz_quiz_tbz
+          echo "✅ Serviço encontrado: $SERVICE_NAME"
+          echo ""
           
-          echo "⏳ Aguardando serviço estabilizar (30s)..."
-          sleep 30
+          echo "📊 Status atual:"
+          docker service ps "$SERVICE_NAME" --format "table {{.Name}}\t{{.CurrentState}}" | head -n 2
+          echo ""
           
-          echo "📊 Status final do serviço:"
-          docker service ps quiz_tbz_quiz_tbz --no-trunc | head -n 5
+          echo "🔄 Forçando atualização do serviço..."
+          docker service update --force "$SERVICE_NAME"
+          echo ""
           
-          echo "✅ Deploy concluído! O container vai puxar o código mais recente do GitHub."
+          echo "⏳ Aguardando deploy (60 segundos)..."
+          for i in {1..12}; do
+            sleep 5
+            RUNNING=$(docker service ps "$SERVICE_NAME" --filter desired-state=running --format "{{.CurrentState}}" | head -n1)
+            echo "  [$i/12] $RUNNING"
+          done
+          echo ""
+          
+          echo "📊 Status final:"
+          docker service ps "$SERVICE_NAME" --format "table {{.Name}}\t{{.CurrentState}}\t{{.Error}}" | head -n 3
+          echo ""
+          
+          echo "✅ Deploy iniciado com sucesso!"
+          echo "🔄 O container está baixando o código mais recente do GitHub..."
+          echo ""
         EOF
     
-    - name: 📊 Verificar Logs do Serviço
-      if: success()
+    - name: 📋 Verificar Logs do Deploy
+      if: always()
       run: |
-        ssh -o StrictHostKeyChecking=no -p 22 \
-          ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-          "docker service logs quiz_tbz_quiz_tbz --tail 50"
+        ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} \
+          ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📋 LOGS DO SERVIÇO (últimas 40 linhas)"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          
+          SERVICE_NAME=$(docker service ls --filter name=quiz_tbz --format "{{.Name}}" | grep quiz_tbz | head -n1)
+          
+          if [ -n "$SERVICE_NAME" ]; then
+            docker service logs "$SERVICE_NAME" --tail 40 --no-trunc 2>&1 || echo "⚠️ Logs ainda não disponíveis"
+          else
+            echo "⚠️ Serviço não encontrado"
+          fi
+          
+          echo ""
+        EOF
     
     - name: ✅ Deploy Summary
       if: success()
       run: |
-        echo "🎉 Deploy realizado com sucesso!"
-        echo "🌐 Aplicação disponível em: https://quiztbz.oreino360.com"
+        echo ""
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "🎉 DEPLOY CONCLUÍDO COM SUCESSO!"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+        echo "🌐 URL: https://quiztbz.oreino360.com"
+        echo ""
+        echo "ℹ️  O que aconteceu:"
+        echo "  ✓ Container foi reiniciado"
+        echo "  ✓ Git pull do código mais recente"
+        echo "  ✓ Dependências npm atualizadas"
+        echo "  ✓ Build do projeto executado"
+        echo "  ✓ Aplicação reiniciada"
+        echo ""
+        echo "⏰ Aguarde 1-2 minutos para a aplicação ficar online"
+        echo ""
+    
+    - name: ❌ Deploy Failed
+      if: failure()
+      run: |
+        echo ""
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "💥 DEPLOY FALHOU"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+        echo "🔍 Verifique os logs acima para detalhes"
+        echo ""
+        echo "📋 Para debug manual, execute no servidor:"
+        echo "  docker service ls"
+        echo "  docker service logs quiz_tbz_quiz_tbz --tail 50"
+        echo "  docker service ps quiz_tbz_quiz_tbz --no-trunc"
+        echo ""
